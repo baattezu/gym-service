@@ -23,11 +23,10 @@ public class Trainee extends User {
 
     @Override
     public String toString() {
-        return "Trainee{" +
-                "traineeId=" + traineeId +
-                ", dateOfBirth=" + dateOfBirth +
-                ", address='" + address + '\'' +
-                '}';
+        return String.format(
+                "Trainee { User ID: %s | Trainer ID: %s | Username: %s | First Name: %s | Last Name: %s | Date Of Birth: %s | Address: %s }",
+                getUserId(), traineeId, getUsername(), getFirstName(), getLastName(), dateOfBirth, address
+        );
     }
 
     public Long getTraineeId() {

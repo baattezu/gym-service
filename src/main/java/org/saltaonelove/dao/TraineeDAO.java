@@ -1,12 +1,16 @@
 package org.saltaonelove.dao;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import jakarta.annotation.PostConstruct;
 import org.saltaonelove.dao.utils.IdGenerator;
 import org.saltaonelove.dao.utils.Storage;
 import org.saltaonelove.model.Trainee;
+import org.saltaonelove.util.JsonLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+
 import java.util.List;
 
 @Repository
@@ -18,6 +22,7 @@ public class TraineeDAO {
 
     private Storage storage;
     private IdGenerator idGenerator;
+    private JsonLoader jsonLoader;
 
     @Autowired
     public void setStorage(Storage storage) {
@@ -29,7 +34,15 @@ public class TraineeDAO {
         this.idGenerator = idGenerator;
     }
 
+    @Autowired
+    public void setJsonLoader(JsonLoader jsonLoader) {
+        this.jsonLoader = jsonLoader;
+    }
+
     public Trainee save(Trainee trainee) {
+        if (trainee.getUserId() == null) {
+            trainee.setUserId(idGenerator.nextId("user"));
+        }
         if (trainee.getTraineeId() == null) {
             trainee.setTraineeId(idGenerator.nextId(NAMESPACE));
         }
@@ -49,4 +62,25 @@ public class TraineeDAO {
     public List<Trainee> findAll() {
         return storage.findAll(NAMESPACE);
     }
+
+    @PostConstruct
+    public void loadInitialData() {
+        log.info("Initializing trainee data...");
+        try {
+            long maxUserIdFromInit = 0;
+            long maxTraineeIdFromInit = 0;
+            List<Trainee> trainees = jsonLoader.loadFromJson("trainees.json", new TypeReference<List<Trainee>>() {
+            });
+            for (Trainee trainee : trainees) {
+                maxTraineeIdFromInit = Math.max(maxTraineeIdFromInit, trainee.getTraineeId());
+                save(trainee);
+            }
+            idGenerator.initialize("user", maxUserIdFromInit);
+            idGenerator.initialize(NAMESPACE, maxTraineeIdFromInit);
+            log.info("Successfully loaded {} trainees into storage.", trainees.size());
+        } catch (Exception e) {
+            log.error("Error initializing trainee data", e);
+        }
+    }
+
 }

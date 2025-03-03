@@ -18,10 +18,10 @@ public class Trainer extends User {
 
     @Override
     public String toString() {
-        return "Trainer{" +
-                "trainerId=" + trainerId +
-                ", specialization='" + specialization + '\'' +
-                '}';
+        return String.format(
+                "Trainer { User ID: %s | Trainer ID: %s | Username: %s | First Name: %s | Last Name: %s | Specialization: %s }",
+                getUserId(), trainerId, getUsername(), getFirstName(), getLastName(), specialization
+        );
     }
 
     public Long getTrainerId() {

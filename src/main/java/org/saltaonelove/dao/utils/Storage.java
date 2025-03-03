@@ -34,4 +34,6 @@ public class Storage {
                 .map(obj -> (T) obj) // Прямое кастование
                 .toList();
     }
+
+
 }

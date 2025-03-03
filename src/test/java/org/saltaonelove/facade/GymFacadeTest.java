@@ -35,9 +35,6 @@ class GymFacadeTest {
     @Mock
     private TrainingService trainingService;
 
-    @Mock
-    private Logger log;
-
     @InjectMocks
     private GymFacade gymFacade;
 

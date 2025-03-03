@@ -1,17 +1,9 @@
 package org.saltaonelove.service;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import jakarta.annotation.PostConstruct;
 import org.saltaonelove.dao.TraineeDAO;
-import org.saltaonelove.dao.UserDAO;
 import org.saltaonelove.dto.TraineeDTO;
-import org.saltaonelove.dto.TrainerDTO;
 import org.saltaonelove.model.Trainee;
-import org.saltaonelove.model.Trainer;
-import org.saltaonelove.model.User;
-import org.saltaonelove.util.JsonLoader;
 import org.saltaonelove.util.UpdateUtil;
-import org.saltaonelove.util.UserMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,46 +19,20 @@ public class TraineeService {
 
     @Autowired
     private TraineeDAO traineeDAO;
-
     @Autowired
-    private UserDAO userDAO;
-
-    @Autowired
-    private JsonLoader jsonLoader;
-
-    @PostConstruct
-    public void loadInitialData() {
-        log.info("Initializing trainer data...");
-        try {
-            List<TraineeDTO> trainees = jsonLoader.loadFromJson("trainees.json", new TypeReference<List<TraineeDTO>>() {});
-            for (TraineeDTO traineeDto : trainees) {
-                User user = new User(traineeDto.firstName(), traineeDto.lastName());
-                user = userDAO.save(user);
-
-                Trainee trainee = UserMapper.userToTrainee(user);
-                trainee.setAddress(traineeDto.address());
-                trainee.setDateOfBirth(traineeDto.dateOfBirth());
-                traineeDAO.save(trainee);
-            }
-            log.info("Successfully loaded {} trainees into storage.", trainees.size());
-        } catch (Exception e) {
-            log.error("Error initializing trainee data", e);
-        }
-    }
+    private UserCredentialsService userUtil;
 
     public Trainee registerTrainee(String firstName, String lastName) {
-        User user = new User(firstName, lastName);
-        user = userDAO.save(user);
-        Trainee trainee = UserMapper.userToTrainee(user);
+        Trainee trainee = new Trainee(firstName, lastName);
+        trainee.setUsername(userUtil.generateUsername(trainee));
+        trainee.setPassword(userUtil.generateRandomPassword());
         return traineeDAO.save(trainee);
     }
 
     public Trainee registerTrainee(String firstName, String lastName, LocalDate dateOfBirth, String address) {
-        User user = new User(firstName, lastName);
-        user = userDAO.save(user);
-        Trainee trainee = UserMapper.userToTrainee(user);
-        trainee.setDateOfBirth(dateOfBirth);
-        trainee.setAddress(address);
+        Trainee trainee = new Trainee(firstName, lastName, dateOfBirth, address);
+        trainee.setUsername(userUtil.generateUsername(trainee));
+        trainee.setPassword(userUtil.generateRandomPassword());
         return traineeDAO.save(trainee);
     }
 

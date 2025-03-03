@@ -1,32 +1,22 @@
 [
   {
+    "userId": 3,
+    "trainerId": 1,
     "firstName": "John",
     "lastName": "Doe",
-    "specialization": "Yoga"
+    "username": "John.Doe1",
+    "password":  "xLeL11b4zT",
+    "isActive": true,
+    "specialization": "Bodybuilding"
   },
   {
-    "firstName": "Jouhn",
-    "lastName": "Doue",
-    "specialization": "Yoga"
-  },
-  {
-    "firstName": "Jouhn",
-    "lastName": "Doue",
-    "specialization": "Yoga"
-  },
-  {
-    "firstName": "Jouhn",
-    "lastName": "Doue",
-    "specialization": "Yoga"
-  },
-  {
-    "firstName": "John",
+    "userId": 4,
+    "trainerId": 2,
+    "firstName": "Jane",
     "lastName": "Doe",
-    "specialization": "Yoga"
-  },
-  {
-    "firstName": "John",
-    "lastName": "Doe",
+    "username": "Jane.Doe",
+    "password": "lNA0K062YM",
+    "isActive": true,
     "specialization": "Yoga"
   }
 ]

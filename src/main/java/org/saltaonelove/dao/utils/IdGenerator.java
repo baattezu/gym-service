@@ -10,6 +10,15 @@ public class IdGenerator {
 
     private final Map<String, AtomicLong> idMap = new ConcurrentHashMap<>();
 
+    public void initialize(String namespace, long maxId) {
+        idMap.compute(namespace, (key, existingValue) -> {
+            if (existingValue == null || maxId > existingValue.get()) {
+                return new AtomicLong(maxId + 1);
+            }
+            return existingValue;
+        });
+    }
+
     public Long nextId(String namespace) {
         return idMap.computeIfAbsent(namespace, k -> new AtomicLong(1)).getAndIncrement();
     }

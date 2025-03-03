@@ -58,12 +58,12 @@ public class GymFacade {
 
     public void showTrainees() {
         traineeService.listTrainees().forEach(t ->
-                log.info("Trainee:" + t.getUsername() + " - " + t.getPassword()));
+                log.info(t.toString()));
     }
 
     public void showTrainers() {
         trainerService.listTrainers().forEach(t ->
-                log.info("Trainer:" + t.getUsername() + " - " + t.getPassword()));
+                log.info(t.toString()));
     }
 
 

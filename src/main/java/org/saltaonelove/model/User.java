@@ -1,5 +1,6 @@
 package org.saltaonelove.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,6 +13,8 @@ public class User {
     private String lastName;
     private String username;
     private String password;
+
+    @JsonProperty("isActive")
     private boolean isActive;
 
     public User() {
