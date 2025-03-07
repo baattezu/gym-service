@@ -74,10 +74,10 @@ public class CLIHandler {
         System.out.print("Enter your choice: ");
         while (!scanner.hasNextInt()) {
             System.out.println("Invalid input. Please enter a valid number.");
-            scanner.next(); // Clear invalid input
+            scanner.next();
         }
         int value = scanner.nextInt();
-        scanner.nextLine(); // Consume newline
+        scanner.nextLine();
         return value;
     }
 
@@ -94,10 +94,10 @@ public class CLIHandler {
         System.out.print(prompt);
         while (!scanner.hasNextLong()) {
             System.out.println("Invalid input. Please enter a valid number.");
-            scanner.next(); // Clear invalid input
+            scanner.next();
         }
         long value = scanner.nextLong();
-        scanner.nextLine(); // Consume newline
+        scanner.nextLine();
         return value;
     }
 

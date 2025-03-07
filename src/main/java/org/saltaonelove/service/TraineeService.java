@@ -7,9 +7,11 @@ import org.saltaonelove.util.UpdateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.Trigger;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
@@ -22,15 +24,12 @@ public class TraineeService {
     @Autowired
     private UserCredentialsService userUtil;
 
-    public Trainee registerTrainee(String firstName, String lastName) {
-        Trainee trainee = new Trainee(firstName, lastName);
-        trainee.setUsername(userUtil.generateUsername(trainee));
-        trainee.setPassword(userUtil.generateRandomPassword());
-        return traineeDAO.save(trainee);
-    }
-
-    public Trainee registerTrainee(String firstName, String lastName, LocalDate dateOfBirth, String address) {
-        Trainee trainee = new Trainee(firstName, lastName, dateOfBirth, address);
+    public Trainee registerTrainee(TraineeDTO traineeDTO) {
+        Trainee trainee = new Trainee(
+                traineeDTO.firstName(), traineeDTO.lastName(),
+                traineeDTO.dateOfBirth() != null ? LocalDate.parse(traineeDTO.dateOfBirth(), DateTimeFormatter.ofPattern("yyyy-MM-dd")) : null,
+                traineeDTO.address()
+        );
         trainee.setUsername(userUtil.generateUsername(trainee));
         trainee.setPassword(userUtil.generateRandomPassword());
         return traineeDAO.save(trainee);

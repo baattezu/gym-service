@@ -31,7 +31,7 @@ public class Storage {
 
     public <T> List<T> findAll(String namespace) {
         return storage.getOrDefault(namespace, Map.of()).values().stream()
-                .map(obj -> (T) obj) // Прямое кастование
+                .map(obj -> (T) obj)
                 .toList();
     }
 

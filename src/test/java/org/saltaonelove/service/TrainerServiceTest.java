@@ -42,7 +42,7 @@ class TrainerServiceTest {
         when(userUtil.generateUsername(any(Trainer.class))).thenReturn("John.Doe");
         when(trainerDAO.save(any(Trainer.class))).thenReturn(trainer);
 
-        Trainer result = trainerService.registerTrainer("John", "Doe");
+        Trainer result = trainerService.registerTrainer(new TrainerDTO("John", "Doe"));
 
         assertNotNull(result);
         assertEquals("John", result.getFirstName());
@@ -56,7 +56,7 @@ class TrainerServiceTest {
         when(userUtil.generateUsername(any(Trainer.class))).thenReturn("John.Doe");
         when(trainerDAO.save(any(Trainer.class))).thenReturn(trainer);
 
-        Trainer result = trainerService.registerTrainer("John", "Doe", "Strength Training");
+        Trainer result = trainerService.registerTrainer(new TrainerDTO("John", "Doe", "Strength Training"));
 
         assertNotNull(result);
         assertEquals("John", result.getFirstName());

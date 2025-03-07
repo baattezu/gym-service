@@ -62,21 +62,21 @@ class GymFacadeTest {
 
     @Test
     void testRegisterTrainee() {
-        when(traineeService.registerTrainee("John", "Doe")).thenReturn(trainee);
+        when(traineeService.registerTrainee(new TraineeDTO("John", "Doe"))).thenReturn(trainee);
 
         Trainee result = gymFacade.registerTrainee("John", "Doe");
 
-        verify(traineeService).registerTrainee("John", "Doe");
+        verify(traineeService).registerTrainee(new TraineeDTO("John", "Doe"));
         assertEquals(trainee, result);
     }
 
     @Test
     void testRegisterTrainer() {
-        when(trainerService.registerTrainer("John", "Doe")).thenReturn(trainer);
+        when(trainerService.registerTrainer(new TrainerDTO("John", "Doe"))).thenReturn(trainer);
 
         Trainer result = gymFacade.registerTrainer("John", "Doe");
 
-        verify(trainerService).registerTrainer("John", "Doe");
+        verify(trainerService).registerTrainer(new TrainerDTO("John", "Doe"));
         assertEquals(trainer, result);
     }
 

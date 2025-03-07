@@ -10,7 +10,6 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.springframework:spring-core:6.2.0'
     implementation 'org.springframework:spring-context:6.2.0'
     implementation 'com.fasterxml.jackson.core:jackson-core:2.17.0'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.17.0'

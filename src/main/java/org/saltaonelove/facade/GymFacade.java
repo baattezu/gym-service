@@ -30,11 +30,11 @@ public class GymFacade {
     }
 
     public Trainee registerTrainee(String firstName, String lastName) {
-        return traineeService.registerTrainee(firstName, lastName);
+        return traineeService.registerTrainee(new TraineeDTO(firstName, lastName));
     }
 
     public Trainer registerTrainer(String firstName, String lastName) {
-        return trainerService.registerTrainer(firstName, lastName);
+        return trainerService.registerTrainer(new TrainerDTO(firstName, lastName));
     }
 
     public void registerTraining(Long trainerId, Long traineeId, LocalDate date, Duration duration, String description, String trainingType) {

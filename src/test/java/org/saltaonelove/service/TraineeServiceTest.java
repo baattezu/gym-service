@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.saltaonelove.dao.TraineeDAO;
 import org.saltaonelove.dto.TraineeDTO;
+import org.saltaonelove.dto.TrainerDTO;
 import org.saltaonelove.model.Trainee;
 
 import java.time.LocalDate;
@@ -44,7 +45,7 @@ class TraineeServiceTest {
         when(userUtil.generateUsername(any(Trainee.class))).thenReturn("John.Doe");
         when(traineeDAO.save(any(Trainee.class))).thenReturn(trainee);
 
-        Trainee result = traineeService.registerTrainee("John", "Doe");
+        Trainee result = traineeService.registerTrainee(new TraineeDTO("John", "Doe"));
 
         assertNotNull(result);
         assertEquals("John", result.getFirstName());
@@ -58,7 +59,10 @@ class TraineeServiceTest {
         when(userUtil.generateUsername(any(Trainee.class))).thenReturn("John.Doe");
         when(traineeDAO.save(any(Trainee.class))).thenReturn(trainee);
 
-        Trainee result = traineeService.registerTrainee("John", "Doe", LocalDate.of(1995, 5, 15), "Some Address");
+        Trainee result = traineeService.registerTrainee(
+                new TraineeDTO("John", "Doe",
+                        "1995-05-15", "Some Address")
+        );
 
         assertNotNull(result);
         assertEquals("John", result.getFirstName());

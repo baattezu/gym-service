@@ -22,15 +22,8 @@ public class TrainerService {
     private UserCredentialsService userUtil;
 
 
-    public Trainer registerTrainer(String firstName, String lastName) {
-        Trainer trainer = new Trainer(firstName, lastName);
-        trainer.setUsername(userUtil.generateUsername(trainer));
-        trainer.setPassword(userUtil.generateRandomPassword());
-        return trainerDAO.save(trainer);
-    }
-
-    public Trainer registerTrainer(String firstName, String lastName, String specialization) {
-        Trainer trainer = new Trainer(firstName, lastName, specialization);
+    public Trainer registerTrainer(TrainerDTO trainerDTO) {
+        Trainer trainer = new Trainer(trainerDTO.firstName(), trainerDTO.lastName(), trainerDTO.specialization());
         trainer.setUsername(userUtil.generateUsername(trainer));
         trainer.setPassword(userUtil.generateRandomPassword());
         return trainerDAO.save(trainer);
