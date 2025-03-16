@@ -1,19 +1,21 @@
 package org.saltaonelove.service;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.saltaonelove.dao.TrainingDAO;
-import org.saltaonelove.dao.TrainingTypeDAO;
+import org.saltaonelove.InitModels;
+import org.saltaonelove.dto.TrainingDTO;
 import org.saltaonelove.model.Training;
 import org.saltaonelove.model.TrainingType;
+import org.saltaonelove.repos.TrainingRepository;
+import org.saltaonelove.repos.TrainingTypeRepository;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -22,10 +24,10 @@ import static org.mockito.Mockito.*;
 class TrainingServiceTest {
 
     @Mock
-    private TrainingDAO trainingDAO;
+    private TrainingRepository trainingRepository;
 
     @Mock
-    private TrainingTypeDAO trainingTypeDAO;
+    private TrainingTypeRepository trainingTypeRepository;
 
     @InjectMocks
     private TrainingService trainingService;
@@ -35,76 +37,42 @@ class TrainingServiceTest {
 
     @BeforeEach
     void setUp() {
-        trainingType = new TrainingType("Yoga");
-
-        training = new Training();
-        training.setTraineeId(1L);
-        training.setTrainerId(1L);
-        training.setTrainingId(1L);
-        training.setName("Morning Yoga");
-        training.setTrainingType(trainingType);
-    }
-
-    @Test
-    void testAddTrainingType_NewType() {
-        when(trainingTypeDAO.findAll()).thenReturn(List.of());
-        when(trainingTypeDAO.save(any(TrainingType.class))).thenReturn(trainingType);
-
-        Training result = trainingService.addTrainingType(training, "Yoga");
-
-        assertNotNull(result);
-        assertEquals("Yoga", result.getTrainingType().getName());
-
-        verify(trainingTypeDAO).findAll();
-        verify(trainingTypeDAO).save(any(TrainingType.class));
-    }
-
-    @Test
-    void testAddTrainingType_ExistingType() {
-        when(trainingTypeDAO.findAll()).thenReturn(List.of(trainingType));
-
-        Training result = trainingService.addTrainingType(training, "Yoga");
-
-        assertNotNull(result);
-        assertEquals("Yoga", result.getTrainingType().getName());
-
-        verify(trainingTypeDAO).findAll();
-        verify(trainingTypeDAO, never()).save(any(TrainingType.class));
+        training = InitModels.initTraining();
     }
 
     @Test
     void testCreateTraining() {
-        when(trainingDAO.save(any(Training.class))).thenReturn(training);
+        when(trainingRepository.save(any(Training.class))).thenReturn(training);
 
-        Training result = trainingService.createTraining(training);
+        Training result = trainingService.createTraining(new TrainingDTO(1L,2L, "Cardio with Jane", 1L, LocalDate.of(2012,12,12), 60L));
 
         assertNotNull(result);
-        assertEquals("Morning Yoga", result.getName());
+        assertEquals("Cardio with Jane", result.getTrainingName());
 
-        verify(trainingDAO).save(training);
+        verify(trainingRepository).save(training);
     }
 
     @Test
     void testListTrainings() {
-        when(trainingDAO.findAll()).thenReturn(List.of(training));
+        when(trainingRepository.findAll()).thenReturn(List.of(training));
 
         List<Training> result = trainingService.listTrainings();
 
         assertFalse(result.isEmpty());
         assertEquals(1, result.size());
 
-        verify(trainingDAO).findAll();
+        verify(trainingRepository).findAll();
     }
 
     @Test
     void testGetTraining() {
-        when(trainingDAO.get(1L)).thenReturn(training);
+        when(trainingRepository.findById(1L)).thenReturn(Optional.ofNullable(training));
 
         Training result = trainingService.getTraining(1L);
 
         assertNotNull(result);
         assertEquals(1L, result.getTrainingId());
 
-        verify(trainingDAO).get(1L);
+        verify(trainingRepository).findById(1L);
     }
 }

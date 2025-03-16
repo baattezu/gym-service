@@ -1,53 +1,62 @@
 package org.saltaonelove.service;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.annotation.PostConstruct;
-import org.saltaonelove.dao.TrainingDAO;
-import org.saltaonelove.dao.TrainingTypeDAO;
+import org.saltaonelove.dto.TrainingDTO;
+import org.saltaonelove.model.Trainee;
+import org.saltaonelove.model.Trainer;
 import org.saltaonelove.model.Training;
 import org.saltaonelove.model.TrainingType;
-import org.saltaonelove.model.User;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.saltaonelove.repos.TraineeRepository;
+import org.saltaonelove.repos.TrainerRepository;
+import org.saltaonelove.repos.TrainingRepository;
+import org.saltaonelove.repos.TrainingTypeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
 import java.util.List;
-import java.util.Map;
+import java.util.NoSuchElementException;
 
 @Service
 public class TrainingService {
 
     @Autowired
-    private TrainingDAO trainingDAO;
+    private TraineeRepository traineeRepository;
     @Autowired
-    private TrainingTypeDAO trainingTypeDAO;
+    private TrainerRepository trainerRepository;
+    @Autowired
+    private TrainingTypeRepository trainingTypeRepository;
 
-    public Training addTrainingType(Training training, String trainingTypeName) {
-        TrainingType trainingType = new TrainingType(trainingTypeName);
-        if (trainingTypeDAO.findAll().stream().anyMatch(t -> t.getName()
-                .equals(trainingType.getName()))) {
-            training.setTrainingType(trainingType);
-        } else {
-            trainingTypeDAO.save(trainingType);
-            training.setTrainingType(trainingType);
-        }
-        return training;
-    }
+    @Autowired
+    private TrainingRepository trainingRepository;
 
-    public Training createTraining(Training training) {
-        return trainingDAO.save(training);
+    @Transactional
+    public Training createTraining(TrainingDTO trainingDTO) {
+        Training training = new Training();
+
+        Trainer trainer = trainerRepository.getReferenceById(trainingDTO.trainerId());
+        Trainee trainee = traineeRepository.getReferenceById(trainingDTO.traineeId());
+        TrainingType trainingType = trainingTypeRepository.getReferenceById(trainingDTO.trainingTypeId());
+
+        training.setTrainee(trainee);
+        training.setTrainer(trainer);
+        training.setTrainingName(trainingDTO.trainingName());
+        training.setTrainingType(trainingType);
+        training.setDate(trainingDTO.date());
+        training.setDuration(trainingDTO.duration());
+        return trainingRepository.save(training);
     }
 
     public List<Training> listTrainings() {
-        return trainingDAO.findAll();
+        return trainingRepository.findAll();
     }
 
     public Training getTraining(Long id) {
-        return trainingDAO.get(id);
+        return trainingRepository.findById(id).orElseThrow(
+                () -> new NoSuchElementException("Training with id " + id + " not found"));
+    }
+
+    public List<TrainingType> getTrainingTypes() {
+        return trainingTypeRepository.findAll();
     }
 
 }

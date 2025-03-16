@@ -16,4 +16,5 @@ public class AppConfig {
         configurer.setLocation(new ClassPathResource("application.properties"));
         return configurer;
     }
+
 }

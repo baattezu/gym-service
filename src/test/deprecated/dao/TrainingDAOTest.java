@@ -8,7 +8,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.saltaonelove.dao.utils.IdGenerator;
 import org.saltaonelove.dao.utils.Storage;
-import org.saltaonelove.model.Trainer;
 import org.saltaonelove.model.Training;
 import org.saltaonelove.model.TrainingType;
 

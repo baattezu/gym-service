@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.util.List;
 
+@Deprecated
 @Component
 public class JsonLoader {
     private static final Logger log = LoggerFactory.getLogger(JsonLoader.class);

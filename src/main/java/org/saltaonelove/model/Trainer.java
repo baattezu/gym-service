@@ -1,8 +1,26 @@
 package org.saltaonelove.model;
 
+import jakarta.persistence.*;
+
+import java.util.List;
+
+@Entity
+@Table(name = "trainer")
+@PrimaryKeyJoinColumn(name = "trainer_id", referencedColumnName = "user_id")
+@NamedQuery(
+        name="findTrainer_ByUsername",
+        query="SELECT tr FROM Trainer tr WHERE tr.username LIKE :username"
+)
 public class Trainer extends User {
-    private Long trainerId;
-    private String specialization;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "specialization", referencedColumnName = "training_type_id", nullable = false)
+    private TrainingType specialization;
+
+    @ManyToMany(mappedBy = "trainers", fetch = FetchType.EAGER)
+    private List<Trainee> trainees;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "trainer", orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<Training> trainings;
 
     public Trainer(){
     }
@@ -11,7 +29,7 @@ public class Trainer extends User {
         super(firstName, lastName);
     }
 
-    public Trainer(String firstName, String lastName, String specialization) {
+    public Trainer(String firstName, String lastName, TrainingType specialization) {
         super(firstName, lastName);
         this.specialization = specialization;
     }
@@ -19,25 +37,32 @@ public class Trainer extends User {
     @Override
     public String toString() {
         return String.format(
-                "Trainer { User ID: %s | Trainer ID: %s | Username: %s | First Name: %s | Last Name: %s | Specialization: %s }",
-                getUserId(), trainerId, getUsername(), getFirstName(), getLastName(), specialization
+                "Trainer { Trainer ID: %s | Username: %s | First Name: %s | Last Name: %s | Specialization: %s }",
+                getUserId(), getUsername(), getFirstName(), getLastName(), specialization.getName()
         );
     }
 
-    public Long getTrainerId() {
-        return trainerId;
-    }
-
-    public void setTrainerId(Long trainerId) {
-        this.trainerId = trainerId;
-    }
-
-    public String getSpecialization() {
+    public TrainingType getSpecialization() {
         return specialization;
     }
 
-    public void setSpecialization(String specialization) {
+    public void setSpecialization(TrainingType specialization) {
         this.specialization = specialization;
     }
 
+    public List<Trainee> getTrainees() {
+        return trainees;
+    }
+
+    public void setTrainees(List<Trainee> trainees) {
+        this.trainees = trainees;
+    }
+
+    public List<Training> getTrainings() {
+        return trainings;
+    }
+
+    public void setTrainings(List<Training> trainings) {
+        this.trainings = trainings;
+    }
 }

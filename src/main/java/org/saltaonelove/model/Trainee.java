@@ -1,12 +1,38 @@
 package org.saltaonelove.model;
 
+import jakarta.persistence.*;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Set;
 
+
+@Entity
+@Table(name = "trainee")
+@PrimaryKeyJoinColumn(name = "trainee_id", referencedColumnName = "user_id")
+@NamedQuery(
+        name="findTrainee_ByUsername",
+        query="SELECT te FROM Trainee te WHERE te.username LIKE :username"
+)
 public class Trainee extends User {
-    private Long traineeId;
+
+    @Column(name = "date_of_birth")
     private LocalDate dateOfBirth;
+    @Column(name = "address")
     private String address;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "trainee_trainer",
+            joinColumns = @JoinColumn(name = "trainee_id"),
+            inverseJoinColumns = @JoinColumn(name = "trainer_id")
+    )
+    private List<Trainer> trainers;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "trainee", orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<Training> trainings;
+
 
     public Trainee() {
     }
@@ -24,17 +50,9 @@ public class Trainee extends User {
     @Override
     public String toString() {
         return String.format(
-                "Trainee { User ID: %s | Trainer ID: %s | Username: %s | First Name: %s | Last Name: %s | Date Of Birth: %s | Address: %s }",
-                getUserId(), traineeId, getUsername(), getFirstName(), getLastName(), dateOfBirth, address
+                "Trainee { Trainee ID: %s | Username: %s | First Name: %s | Last Name: %s | Date Of Birth: %s | Address: %s }",
+                getUserId(), getUsername(), getFirstName(), getLastName(), dateOfBirth, address
         );
-    }
-
-    public Long getTraineeId() {
-        return traineeId;
-    }
-
-    public void setTraineeId(Long traineeId) {
-        this.traineeId = traineeId;
     }
 
     public LocalDate getDateOfBirth() {
@@ -55,5 +73,21 @@ public class Trainee extends User {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public List<Trainer> getTrainers() {
+        return trainers;
+    }
+
+    public void setTrainers(List<Trainer> trainers) {
+        this.trainers = trainers;
+    }
+
+    public List<Training> getTrainings() {
+        return trainings;
+    }
+
+    public void setTrainings(List<Training> trainings) {
+        this.trainings = trainings;
     }
 }

@@ -5,7 +5,6 @@ import jakarta.annotation.PostConstruct;
 import org.saltaonelove.dao.utils.IdGenerator;
 import org.saltaonelove.dao.utils.Storage;
 import org.saltaonelove.model.Trainee;
-import org.saltaonelove.util.JsonLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +12,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+@Deprecated
 @Repository
 public class TraineeDAO {
 

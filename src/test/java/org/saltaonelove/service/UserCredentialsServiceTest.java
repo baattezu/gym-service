@@ -6,11 +6,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.saltaonelove.dao.TraineeDAO;
-import org.saltaonelove.dao.TrainerDAO;
 import org.saltaonelove.model.Trainee;
 import org.saltaonelove.model.Trainer;
 import org.saltaonelove.model.User;
+import org.saltaonelove.repos.UserRepository;
 
 import java.util.List;
 
@@ -21,10 +20,7 @@ import static org.mockito.Mockito.when;
 class UserCredentialsServiceTest {
 
     @Mock
-    private TraineeDAO traineeDAO;
-
-    @Mock
-    private TrainerDAO trainerDAO;
+    private UserRepository userRepository;
 
     @InjectMocks
     private UserCredentialsService userCredentialsService;
@@ -35,8 +31,7 @@ class UserCredentialsServiceTest {
     @Test
     void generateUsername_noConflicts_returnsBaseUsername() {
         User user = new User("John", "Doe");
-        when(trainerDAO.findAll()).thenReturn(List.of());
-        when(traineeDAO.findAll()).thenReturn(List.of());
+        when(userRepository.findAll()).thenReturn(List.of());
 
         String username = userCredentialsService.generateUsername(user);
 
@@ -46,13 +41,13 @@ class UserCredentialsServiceTest {
     @Test
     void generateUsername_withExistingUsers_generatesUniqueUsername() {
         User user = new User("Jane", "Smith");
+
         Trainee existingUser1 = new Trainee("Jane", "Smith");
         existingUser1.setUsername("Jane.Smith");
         Trainer existingUser2 = new Trainer("Jane", "Smith");
         existingUser2.setUsername("Jane.Smith1");
 
-        when(traineeDAO.findAll()).thenReturn(List.of(existingUser1));
-        when(trainerDAO.findAll()).thenReturn(List.of(existingUser2));
+        when(userRepository.findAll()).thenReturn(List.of(existingUser1, existingUser2));
 
         String username = userCredentialsService.generateUsername(user);
 

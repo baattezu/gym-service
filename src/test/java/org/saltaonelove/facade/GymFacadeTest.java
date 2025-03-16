@@ -6,6 +6,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.saltaonelove.InitModels;
+import org.saltaonelove.dto.AuthRequest;
 import org.saltaonelove.dto.TraineeDTO;
 import org.saltaonelove.dto.TrainerDTO;
 import org.saltaonelove.model.Trainee;
@@ -14,7 +16,6 @@ import org.saltaonelove.model.Training;
 import org.saltaonelove.service.TraineeService;
 import org.saltaonelove.service.TrainerService;
 import org.saltaonelove.service.TrainingService;
-import org.slf4j.Logger;
 
 import java.time.Duration;
 import java.time.LocalDate;
@@ -42,22 +43,14 @@ class GymFacadeTest {
     private Trainer trainer;
     private Training training;
 
+    private AuthRequest defaultAuth;
+
     @BeforeEach
     void setUp() {
-        trainee = new Trainee();
-        trainee.setTraineeId(1L);
-        trainee.setPassword("password1");
-
-        trainer = new Trainer();
-        trainer.setTrainerId(1L);
-        trainer.setPassword("password1");
-
-        training = new Training();
-        training.setTrainerId(1L);
-        training.setTraineeId(1L);
-        training.setName("Strength Training");
-        training.setDate(LocalDate.of(2024, 2, 1));
-        training.setDuration(Duration.ofMinutes(60));
+        trainee = InitModels.initTrainee();
+        trainer = InitModels.initTrainer();
+        training = InitModels.initTraining(trainee, trainer, trainer.getSpecialization());
+        defaultAuth = new AuthRequest(trainee.getUsername(), trainee.getPassword());
     }
 
     @Test
@@ -72,62 +65,72 @@ class GymFacadeTest {
 
     @Test
     void testRegisterTrainer() {
-        when(trainerService.registerTrainer(new TrainerDTO("John", "Doe"))).thenReturn(trainer);
+        when(trainerService.registerTrainer(new TrainerDTO("Jane", "Doe", "Cardio"))).thenReturn(trainer);
 
-        Trainer result = gymFacade.registerTrainer("John", "Doe");
+        Trainer result = gymFacade.registerTrainer("Jane", "Doe", "Cardio");
 
-        verify(trainerService).registerTrainer(new TrainerDTO("John", "Doe"));
+        verify(trainerService).registerTrainer(new TrainerDTO("Jane", "Doe", "Cardio"));
         assertEquals(trainer, result);
     }
 
     @Test
     void testRegisterTraining() {
-        gymFacade.registerTraining(1L, 1L, LocalDate.of(2024, 2, 1), Duration.ofMinutes(60), "Strength Training", "Cardio");
+        gymFacade.registerTraining(2L, 1L, LocalDate.of(2001, 1, 1), 60L, "Strength Training", 1L);
 
-        verify(trainingService).addTrainingType(any(Training.class), eq("Cardio"));
-        verify(trainingService).createTraining(any(Training.class));
+        verify(trainingService).createTraining(any(org.saltaonelove.dto.TrainingDTO.class));
     }
 
     @Test
     void testUpdateTrainer() {
-        TrainerDTO trainerDTO = new TrainerDTO("NewName", "NewLastName", "Strength");
+        Trainer updTrainer = trainer;
+        updTrainer.setLastName("Down");
 
-        when(trainerService.updateTrainer(1L, trainerDTO)).thenReturn(trainer);
+        TrainerDTO updTrainerDTO = new TrainerDTO("Jane", "Down", "Cardio");
 
-        Trainer result = gymFacade.updateTrainer(1L, trainerDTO);
+        AuthRequest auth = new AuthRequest(trainer.getUsername(), trainee.getPassword());
 
-        verify(trainerService).updateTrainer(1L, trainerDTO);
+        when(trainerService.updateTrainer(auth, updTrainerDTO)).thenReturn(trainer);
+
+        Trainer result = gymFacade.updateTrainer(auth, updTrainerDTO);
+
+        verify(trainerService).updateTrainer(auth, updTrainerDTO);
         assertEquals(trainer, result);
     }
 
     @Test
     void testUpdateTrainee() {
-        TraineeDTO traineeDTO = new TraineeDTO("NewName", "NewLastName", "2001-01-01", "New Address");
+        Trainee updTrainee = trainee;
+        updTrainee.setLastName("Down");
+        updTrainee.setAddress("New Address");
 
-        when(traineeService.updateTrainee(1L, traineeDTO)).thenReturn(trainee);
+        TraineeDTO updTraineeDTO = new TraineeDTO("John", "Down", "2001-01-01", "New Address");
 
-        Trainee result = gymFacade.updateTrainee(1L, traineeDTO);
+        AuthRequest auth = new AuthRequest(trainee.getUsername(), trainee.getPassword());
 
-        verify(traineeService).updateTrainee(1L, traineeDTO);
+        when(traineeService.updateTrainee(auth, updTraineeDTO)).thenReturn(updTrainee);
+
+        Trainee result = gymFacade.updateTrainee(auth, updTraineeDTO);
+
+        verify(traineeService).updateTrainee(auth, updTraineeDTO);
         assertEquals(trainee, result);
     }
 
     @Test
     void testShowTrainees() {
-        when(traineeService.listTrainees()).thenReturn(List.of(trainee));
+        when(traineeService.listTrainees(defaultAuth)).thenReturn(List.of(trainee));
 
-        gymFacade.showTrainees();
+        gymFacade.showTrainees(defaultAuth);
 
-        verify(traineeService).listTrainees();
+        verify(traineeService).listTrainees(defaultAuth);
     }
 
     @Test
     void testShowTrainers() {
-        when(trainerService.listTrainers()).thenReturn(List.of(trainer));
+        when(trainerService.listTrainers(defaultAuth)).thenReturn(List.of(trainer));
 
-        gymFacade.showTrainers();
+        gymFacade.showTrainers(defaultAuth);
 
-        verify(trainerService).listTrainers();
+        verify(trainerService).listTrainers(defaultAuth);
     }
 
     @Test

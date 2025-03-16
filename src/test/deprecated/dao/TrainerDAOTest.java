@@ -1,7 +1,6 @@
 package org.saltaonelove.dao;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -41,6 +40,7 @@ class TrainerDAOTest {
 
     @Test
     void testSave() {
+        when(idGenerator.nextId("user")).thenReturn(100L);
         when(idGenerator.nextId("trainer")).thenReturn(100L);
 
         trainer.setTrainerId(null);

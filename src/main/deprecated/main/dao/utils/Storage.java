@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 
+@Deprecated
 @Component
 public class Storage {
     private final Map<String, Map<Long, Object>> storage = new ConcurrentHashMap<>();

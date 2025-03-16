@@ -1,8 +1,7 @@
 package org.saltaonelove.service;
 
-import org.saltaonelove.dao.TraineeDAO;
-import org.saltaonelove.dao.TrainerDAO;
 import org.saltaonelove.model.User;
+import org.saltaonelove.repos.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,10 +13,7 @@ import java.util.List;
 public class UserCredentialsService {
 
     @Autowired
-    private TraineeDAO traineeDAO;
-
-    @Autowired
-    private TrainerDAO trainerDAO;
+    private UserRepository userRepository;
 
     private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     private static final SecureRandom RANDOM = new SecureRandom();
@@ -54,8 +50,7 @@ public class UserCredentialsService {
 
     private List<User> loadUsers() {
         List<User> users = new ArrayList<>();
-        users.addAll(trainerDAO.findAll());
-        users.addAll(traineeDAO.findAll());
+        users.addAll(userRepository.findAll());
         return users;
     }
 }

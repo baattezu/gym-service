@@ -1,20 +1,35 @@
 package org.saltaonelove.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import jakarta.annotation.Nonnull;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 
 import java.util.Objects;
 
+
+@Entity
+@Table(name = "users")
+@Inheritance(strategy = InheritanceType.JOINED)
 public class User {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id")
     private Long userId;
-
+    @Column(name = "first_name")
+    @NotNull
     private String firstName;
+    @Column(name = "last_name")
+    @NotNull
     private String lastName;
+    @Column(name = "username")
+    @NotNull
     private String username;
+    @Column(name = "password")
+    @NotNull
     private String password;
-
-    @JsonProperty("isActive")
+    @Column(name = "is_active")
+    @NotNull
     private boolean isActive;
 
     public User() {
@@ -30,14 +45,7 @@ public class User {
 
     @Override
     public String toString() {
-        return "User{" +
-                "userId=" + userId +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", username='" + username + '\'' +
-                ", password='" + password + '\'' +
-                ", isActive=" + isActive +
-                '}';
+        return String.format("User { User ID: %s | Username: %s | First Name: %s | Last Name: %s | IsActive: %s }", userId, username, firstName, lastName, isActive);
     }
 
     @Override
