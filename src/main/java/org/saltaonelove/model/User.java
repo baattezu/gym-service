@@ -2,6 +2,7 @@ package org.saltaonelove.model;
 
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
 import java.util.Objects;
@@ -17,19 +18,20 @@ public class User {
     @Column(name = "user_id")
     private Long userId;
     @Column(name = "first_name")
-    @NotNull
+    @NotNull(message = "First name should not be null")
     private String firstName;
     @Column(name = "last_name")
-    @NotNull
+    @NotNull(message = "Last name should not be null")
     private String lastName;
     @Column(name = "username")
-    @NotNull
+    @NotNull(message = "Username should not be null")
     private String username;
     @Column(name = "password")
-    @NotNull
+    @NotNull(message = "Password should not be null")
+    @Min(value = 10, message = "Password should be at least 10 characters")
     private String password;
     @Column(name = "is_active")
-    @NotNull
+    @NotNull(message = "Activation field should not be null")
     private boolean isActive;
 
     public User() {

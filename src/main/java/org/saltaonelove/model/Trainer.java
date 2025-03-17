@@ -1,6 +1,7 @@
 package org.saltaonelove.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 
 import java.util.List;
 
@@ -14,6 +15,7 @@ import java.util.List;
 public class Trainer extends User {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "specialization", referencedColumnName = "training_type_id", nullable = false)
+    @NotNull(message = "Specialization should not be null")
     private TrainingType specialization;
 
     @ManyToMany(mappedBy = "trainers", fetch = FetchType.EAGER)

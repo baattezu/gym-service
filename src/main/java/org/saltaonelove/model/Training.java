@@ -20,7 +20,7 @@ public class Training {
     @JoinColumn(name = "trainer_id", nullable = false)
     private Trainer trainer;
     @Column(name = "training_name", nullable = false)
-    @NotNull
+    @NotNull(message = "Training name should not be null")
     private String trainingName;
 
     @ManyToOne(fetch = FetchType.EAGER)
@@ -28,11 +28,11 @@ public class Training {
     private TrainingType trainingType;
 
     @Column(name = "training_date")
-    @NotNull
+    @NotNull(message = "Date of training should not be null")
     private LocalDate date;
 
     @Column(name = "training_duration")
-    @NotNull
+    @NotNull(message = "Duration of training should not be null")
     private Long duration;
 
     public Training() {
