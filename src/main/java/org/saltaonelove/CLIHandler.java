@@ -159,7 +159,6 @@ public class CLIHandler {
         String firstName = getStringInput("Enter first name: ");
         String lastName = getStringInput("Enter last name: ");
         gymFacade.registerTrainee(firstName, lastName);
-        System.out.println("✅ Trainee registered successfully!");
     }
 
     private void registerTrainer() {
@@ -169,7 +168,6 @@ public class CLIHandler {
                 gymFacade.getTrainingTypes().stream().map(TrainingType::getName).collect(Collectors.toList())
         );
         gymFacade.registerTrainer(firstName, lastName, specialization);
-        System.out.println("✅ Trainer registered successfully!");
     }
 
     private void registerTraining() {
@@ -179,7 +177,6 @@ public class CLIHandler {
         long category = getLongInput("Enter training type id: ");
 
         gymFacade.registerTraining(trainerId, traineeId, LocalDate.now(), 50L, trainingName, category);
-        System.out.println("✅ Training registered successfully!");
     }
 
     private void updateTrainer(AuthRequest auth) {
@@ -191,7 +188,6 @@ public class CLIHandler {
                 )
         );
         gymFacade.updateTrainer(auth, updatedTrainer);
-        System.out.println("✅ Trainer updated successfully!");
     }
 
     private void updateTrainee(AuthRequest auth) {
@@ -202,7 +198,6 @@ public class CLIHandler {
                 getStringInput("Enter new address: ")
         );
         gymFacade.updateTrainee(auth, updatedTrainee);
-        System.out.println("✅ Trainee updated successfully!");
     }
 
     private void changePasswordForTrainee(AuthRequest auth) {
@@ -214,8 +209,7 @@ public class CLIHandler {
     }
 
     private void deleteTrainee(AuthRequest auth) {
-        gymFacade.deleteTrainee(getStringInput("Enter Trainee username: "));
-        System.out.println("✅ Delete Trainee successfully!");
+        gymFacade.deleteTrainee(auth, getStringInput("Enter Trainee username: "));
     }
 
     public void showTraineeTrainingByCriteria(AuthRequest auth) {

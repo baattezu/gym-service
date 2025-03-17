@@ -30,6 +30,7 @@ public class TrainerService {
 
     @Transactional
     public Trainer registerTrainer(TrainerDTO trainerDTO) {
+        log.info("Registering trainer: {} {}", trainerDTO.firstName(), trainerDTO.lastName());
         Trainer trainer = new Trainer(
                 trainerDTO.firstName(), trainerDTO.lastName(),
                 trainingTypeRepository.findByName(trainerDTO.specialization()).orElseThrow(
@@ -38,16 +39,20 @@ public class TrainerService {
         );
         trainer.setUsername(userUtil.generateUsername(trainer));
         trainer.setPassword(userUtil.generateRandomPassword());
-        return trainerRepository.save(trainer);
+        trainer = trainerRepository.save(trainer);
+        log.info("Trainer {} successfully registered", trainer.getUsername());
+        return trainer;
     }
 
     public Trainer loginForTrainer(AuthRequest auth) {
+        log.info("Trainer login attempt: {}", auth.username());
         Trainer trainer = trainerRepository.findByUsername(auth.username())
                 .orElseThrow(() -> new IllegalArgumentException("Username not found: " + auth.username()));
         if (trainer.getPassword().equals(auth.password())) {
-            log.info("Logged in user: " + auth.username());
+            log.info("Logged in user: {}", auth.username());
             return trainer;
         }
+        log.warn("Login attempt failed for user: {}", auth.username());
         throw new IllegalArgumentException("Wrong password");
     }
 
@@ -58,7 +63,7 @@ public class TrainerService {
                 () -> new IllegalArgumentException("Trainer not found")
         );
         trainer.setActive(!trainer.isActive());
-        log.info("Trainer is active: " + trainer.isActive());
+        log.info("Trainer {} is {}", trainer.getUsername(), trainer.isActive() ? "activated" : "deactivated");
         return trainerRepository.save(trainer);
     }
 
@@ -70,6 +75,7 @@ public class TrainerService {
 
     public Trainer showProfile(AuthRequest auth) {
         loginForTrainer(auth);
+        log.info("Showing profile for user: {}", auth.username());
         Trainer trainer = trainerRepository.findByUsername(auth.username())
                 .orElseThrow(() -> new IllegalArgumentException("Username not found: " + auth.username()));
         return trainer;
@@ -78,6 +84,7 @@ public class TrainerService {
     @Transactional
     public Trainer updateTrainer(AuthRequest auth, TrainerDTO trainerDto) {
         loginForTrainer(auth);
+        log.info("Updating trainer: {} {}", trainerDto.firstName(), trainerDto.lastName());
         Trainer trainer = trainerRepository.findByUsername(auth.username()).orElseThrow(() -> new IllegalArgumentException("Trainer not found"));
 
         UpdateUtil.setIfNotNull(trainerDto.firstName(), trainer::setFirstName);
@@ -86,28 +93,36 @@ public class TrainerService {
                         .orElseThrow(() -> new IllegalArgumentException("Specialization not found"))
                 , trainer::setSpecialization);
 
-        return trainerRepository.save(trainer);
+        trainer = trainerRepository.save(trainer);
+        log.info("Updated trainer {}'s profile successfully!", auth.username());
+        return trainer;
     }
 
     @Transactional
     public Trainer changePassword(AuthRequest auth, String newPassword) {
         loginForTrainer(auth);
+        log.info("User {} is attempting to change their password", auth.username());
         Trainer trainer = trainerRepository.findByUsername(auth.username()).orElseThrow(()-> new IllegalArgumentException("Trainer not found: " + auth.username()));
         if (trainer.getPassword().equals(newPassword) || newPassword.length() < 10) {
             throw new IllegalArgumentException("New password repeats old password match or new password is too short");
         }
         trainer.setPassword(newPassword);
-        return trainerRepository.save(trainer);
+
+        trainer = trainerRepository.save(trainer);
+        log.info("Trainer {} changed password successfully", auth.username());
+        return trainer;
     }
 
 
     public List<Training> getTrainerTrainings(AuthRequest authRequest, LocalDate fromDate, LocalDate toDate, String traineeName, String trainingType) {
         loginForTrainer(authRequest);
+        log.info("Fetching trainings for trainer {}", authRequest.username());
         return trainerRepository.findTrainerTrainingsByUsernameAndCriteria(authRequest.username(), fromDate, toDate, traineeName, trainingType);
     }
 
     public List<Trainer> getTrainersAvailableForTrainee(AuthRequest authRequest, String traineeName){
         loginForTrainer(authRequest);
+        log.info("Fetching available trainers for trainee {}", traineeName);
         return trainerRepository.findTrainersThatAreNotAssignedToTrainee(traineeName);
     }
 

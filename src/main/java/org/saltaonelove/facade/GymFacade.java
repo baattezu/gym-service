@@ -84,8 +84,8 @@ public class GymFacade {
         log.info(trainerService.showProfile(authRequest).toString());
     }
 
-    public void deleteTrainee(String traineeUsername) {
-        traineeService.deleteTrainee(traineeUsername);
+    public void deleteTrainee(AuthRequest authRequest, String traineeUsername) {
+        traineeService.deleteTrainee(authRequest, traineeUsername);
     }
 
     public List<TrainingType> getTrainingTypes() {
