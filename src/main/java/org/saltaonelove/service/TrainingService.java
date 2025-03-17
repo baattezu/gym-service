@@ -1,5 +1,6 @@
 package org.saltaonelove.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.saltaonelove.dto.TrainingDTO;
 import org.saltaonelove.model.Trainee;
 import org.saltaonelove.model.Trainer;
@@ -33,9 +34,14 @@ public class TrainingService {
     public Training createTraining(TrainingDTO trainingDTO) {
         Training training = new Training();
 
-        Trainer trainer = trainerRepository.getReferenceById(trainingDTO.trainerId());
-        Trainee trainee = traineeRepository.getReferenceById(trainingDTO.traineeId());
-        TrainingType trainingType = trainingTypeRepository.getReferenceById(trainingDTO.trainingTypeId());
+        Trainer trainer = trainerRepository.findById(trainingDTO.trainerId())
+                .orElseThrow(() -> new EntityNotFoundException("Trainer not found with ID: " + trainingDTO.trainerId()));
+
+        Trainee trainee = traineeRepository.findById(trainingDTO.traineeId())
+                .orElseThrow(() -> new EntityNotFoundException("Trainee not found with ID: " + trainingDTO.traineeId()));
+
+        TrainingType trainingType = trainingTypeRepository.findById(trainingDTO.trainingTypeId())
+                .orElseThrow(() -> new EntityNotFoundException("TrainingType not found with ID: " + trainingDTO.trainingTypeId()));
 
         training.setTrainee(trainee);
         training.setTrainer(trainer);
