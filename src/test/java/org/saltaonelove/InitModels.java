@@ -15,7 +15,7 @@ public class InitModels {
         trainee.setFirstName("John");
         trainee.setLastName("Doe");
         trainee.setUsername("John.Doe");
-        trainee.setPassword("password1");
+        trainee.setPassword("password123");
         trainee.setDateOfBirth("2001-01-01");
         trainee.setAddress("address1");
         trainee.setActive(true);
@@ -35,7 +35,7 @@ public class InitModels {
         trainer.setFirstName("Jane");
         trainer.setLastName("Doe");
         trainer.setUsername("Jane.Doe");
-        trainer.setPassword("password1");
+        trainer.setPassword("password123");
         trainer.setSpecialization(initTrainingType());
         trainer.setActive(true);
         return trainer;

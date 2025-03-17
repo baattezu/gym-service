@@ -81,7 +81,7 @@ class TraineeServiceTest {
     void testLogin() {
         when(traineeRepository.findByUsername(traineeAuth.username())).thenReturn(Optional.ofNullable(trainee));
 
-        traineeService.login(traineeAuth);
+        traineeService.loginForTrainee(traineeAuth);
 
         verify(traineeRepository).findByUsername(traineeAuth.username());
     }
@@ -106,11 +106,11 @@ class TraineeServiceTest {
 
     @Test
     void testLoginWrongPassword() {
-        AuthRequest wrongPasswordAuth = new AuthRequest(traineeAuth.username(), "123boros");
+        AuthRequest wrongPasswordAuth = new AuthRequest(traineeAuth.username(), "1337S1mple");
 
         when(traineeRepository.findByUsername(wrongPasswordAuth.username())).thenReturn(Optional.ofNullable(trainee));
 
-        assertThrows(IllegalArgumentException.class, () -> traineeService.login(wrongPasswordAuth));
+        assertThrows(IllegalArgumentException.class, () -> traineeService.loginForTrainee(wrongPasswordAuth));
 
         verify(traineeRepository).findByUsername(traineeAuth.username());
     }
@@ -168,12 +168,11 @@ class TraineeServiceTest {
         when(traineeRepository.findByUsername(traineeAuth.username())).thenReturn(Optional.ofNullable(trainee));
         when(traineeRepository.save(any(Trainee.class))).thenReturn(trainee);
 
-        String newPassword = "newPassword";
+        String newPassword = "newPassword123";
 
         Trainee changedPassword = traineeService.changePassword(traineeAuth, newPassword);
 
         assertNotNull(changedPassword);
-        assertNotEquals(trainee.getPassword(), changedPassword.getPassword());
         assertEquals(newPassword, changedPassword.getPassword());
 
         verify(traineeRepository, times(2)).findByUsername(traineeAuth.username());
@@ -183,7 +182,7 @@ class TraineeServiceTest {
     public void testChangePasswordWrongPasswordLength(){
         when(traineeRepository.findByUsername(traineeAuth.username())).thenReturn(Optional.ofNullable(trainee));
 
-        String newPasswordThatShort = "newPas";
+        String newPasswordThatShort = "newPa";
 
         assertThrows(IllegalArgumentException.class, () -> traineeService.changePassword(traineeAuth, newPasswordThatShort));
 

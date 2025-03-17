@@ -41,7 +41,7 @@ public class TraineeService {
         return traineeRepository.save(trainee);
     }
 
-    public Trainee login(AuthRequest auth) {
+    public Trainee loginForTrainee(AuthRequest auth) {
         Trainee trainee = traineeRepository.findByUsername(auth.username())
                 .orElseThrow(() -> new IllegalArgumentException("Username not found: " + auth.username()));
         if (trainee.getPassword().equals(auth.password())) {
@@ -53,7 +53,7 @@ public class TraineeService {
 
     @Transactional
     public Trainee toggleActivationOfAccount(AuthRequest auth) {
-        login(auth);
+        loginForTrainee(auth);
         Trainee trainee = traineeRepository.findByUsername(auth.username()).orElseThrow(
                 () -> new IllegalArgumentException("Trainer not found")
         );
@@ -63,12 +63,12 @@ public class TraineeService {
     }
 
     public List<Trainee> listTrainees(AuthRequest auth) {
-        login(auth);
+        loginForTrainee(auth);
         return traineeRepository.findAll();
     }
 
     public Trainee showProfile(AuthRequest auth) {
-        login(auth);
+        loginForTrainee(auth);
         Trainee trainee = traineeRepository.findByUsername(auth.username())
                 .orElseThrow(() -> new IllegalArgumentException("Username not found: " + auth.username()));
         return trainee;
@@ -76,7 +76,7 @@ public class TraineeService {
 
     @Transactional
     public Trainee updateTrainee(AuthRequest auth, TraineeDTO traineeDto) {
-        login(auth);
+        loginForTrainee(auth);
         Trainee trainee = traineeRepository.findByUsername(auth.username()).orElseThrow(() -> new IllegalArgumentException("Trainee not found"));
 
         UpdateUtil.setIfNotNull(traineeDto.firstName(), trainee::setFirstName);
@@ -89,16 +89,15 @@ public class TraineeService {
     }
 
     public List<Training> getTraineeTrainings(AuthRequest authRequest, LocalDate fromDate, LocalDate toDate, String trainerName, String trainingType) {
-        login(authRequest);
+        loginForTrainee(authRequest);
         return traineeRepository.findTraineeTrainingsByUsernameAndCriteria(authRequest.username(), fromDate, toDate, trainerName, trainingType);
     }
 
     @Transactional
     public Trainee changePassword(AuthRequest auth, String newPassword) {
-        login(auth);
+        loginForTrainee(auth);
         Trainee trainee = traineeRepository.findByUsername(auth.username()).orElseThrow(()-> new IllegalArgumentException("Trainer not found: " + auth.username()));
-        if (trainee.getPassword().equals(newPassword) || newPassword.length() <= 6) {
-            log.error("New password repeats old password match or new password is too short");
+        if (trainee.getPassword().equals(newPassword) || newPassword.length() < 10) {
             throw new IllegalArgumentException("New password repeats old password match or new password is too short");
         }
         trainee.setPassword(newPassword);
@@ -107,7 +106,7 @@ public class TraineeService {
 
     @Transactional
     public Trainee updateTrainerList(AuthRequest auth, List<Trainer> trainerList) {
-        login(auth);
+        loginForTrainee(auth);
         Trainee trainee = traineeRepository.findByUsername(auth.username()).orElseThrow(()-> new IllegalArgumentException("Trainer not found: " + auth.username()));
         trainee.setTrainers(trainerList);
         return traineeRepository.save(trainee);

@@ -41,7 +41,7 @@ public class TrainerService {
         return trainerRepository.save(trainer);
     }
 
-    public Trainer login(AuthRequest auth) {
+    public Trainer loginForTrainer(AuthRequest auth) {
         Trainer trainer = trainerRepository.findByUsername(auth.username())
                 .orElseThrow(() -> new IllegalArgumentException("Username not found: " + auth.username()));
         if (trainer.getPassword().equals(auth.password())) {
@@ -53,7 +53,7 @@ public class TrainerService {
 
     @Transactional
     public Trainer toggleActivationOfAccount(AuthRequest auth) {
-        login(auth);
+        loginForTrainer(auth);
         Trainer trainer = trainerRepository.findByUsername(auth.username()).orElseThrow(
                 () -> new IllegalArgumentException("Trainer not found")
         );
@@ -64,12 +64,12 @@ public class TrainerService {
 
 
     public List<Trainer> listTrainers(AuthRequest auth) {
-        login(auth);
+        loginForTrainer(auth);
         return trainerRepository.findAll();
     }
 
     public Trainer showProfile(AuthRequest auth) {
-        login(auth);
+        loginForTrainer(auth);
         Trainer trainer = trainerRepository.findByUsername(auth.username())
                 .orElseThrow(() -> new IllegalArgumentException("Username not found: " + auth.username()));
         return trainer;
@@ -77,7 +77,7 @@ public class TrainerService {
 
     @Transactional
     public Trainer updateTrainer(AuthRequest auth, TrainerDTO trainerDto) {
-        login(auth);
+        loginForTrainer(auth);
         Trainer trainer = trainerRepository.findByUsername(auth.username()).orElseThrow(() -> new IllegalArgumentException("Trainer not found"));
 
         UpdateUtil.setIfNotNull(trainerDto.firstName(), trainer::setFirstName);
@@ -91,10 +91,10 @@ public class TrainerService {
 
     @Transactional
     public Trainer changePassword(AuthRequest auth, String newPassword) {
-        login(auth);
+        loginForTrainer(auth);
         Trainer trainer = trainerRepository.findByUsername(auth.username()).orElseThrow(()-> new IllegalArgumentException("Trainer not found: " + auth.username()));
-        if (trainer.getPassword().equals(newPassword) && newPassword.length() < 6) {
-            log.error("New password repeats old password match or new password is too short");
+        if (trainer.getPassword().equals(newPassword) || newPassword.length() < 10) {
+            throw new IllegalArgumentException("New password repeats old password match or new password is too short");
         }
         trainer.setPassword(newPassword);
         return trainerRepository.save(trainer);
@@ -102,12 +102,12 @@ public class TrainerService {
 
 
     public List<Training> getTrainerTrainings(AuthRequest authRequest, LocalDate fromDate, LocalDate toDate, String traineeName, String trainingType) {
-        login(authRequest);
+        loginForTrainer(authRequest);
         return trainerRepository.findTrainerTrainingsByUsernameAndCriteria(authRequest.username(), fromDate, toDate, traineeName, trainingType);
     }
 
-    public List<Trainer> getTrainerAvailableForTrainee(AuthRequest authRequest, String traineeName){
-        login(authRequest);
+    public List<Trainer> getTrainersAvailableForTrainee(AuthRequest authRequest, String traineeName){
+        loginForTrainer(authRequest);
         return trainerRepository.findTrainersThatAreNotAssignedToTrainee(traineeName);
     }
 

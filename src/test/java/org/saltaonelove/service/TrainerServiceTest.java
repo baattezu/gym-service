@@ -10,20 +10,14 @@ import org.saltaonelove.InitModels;
 import org.saltaonelove.dto.AuthRequest;
 import org.saltaonelove.dto.TrainerDTO;
 import org.saltaonelove.model.Trainer;
-import org.saltaonelove.model.Trainer;
-import org.saltaonelove.model.Trainer;
-import org.saltaonelove.repos.TrainerRepository;
 import org.saltaonelove.repos.TrainerRepository;
 import org.saltaonelove.repos.TrainingTypeRepository;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-import static sun.security.jgss.GSSUtil.login;
 
 @ExtendWith(MockitoExtension.class)
 class TrainerServiceTest {
@@ -70,7 +64,7 @@ class TrainerServiceTest {
     void testLogin() {
         when(trainerRepository.findByUsername(trainerAuth.username())).thenReturn(Optional.ofNullable(trainer));
 
-        trainerService.login(trainerAuth);
+        trainerService.loginForTrainer(trainerAuth);
 
         verify(trainerRepository).findByUsername(trainerAuth.username());
     }
@@ -95,11 +89,11 @@ class TrainerServiceTest {
 
     @Test
     void testLoginWrongPassword() {
-        AuthRequest wrongPasswordAuth = new AuthRequest(trainerAuth.username(), "123boros");
+        AuthRequest wrongPasswordAuth = new AuthRequest(trainerAuth.username(), "1337S1mple");
 
         when(trainerRepository.findByUsername(wrongPasswordAuth.username())).thenReturn(Optional.ofNullable(trainer));
 
-        assertThrows(IllegalArgumentException.class, () -> trainerService.login(wrongPasswordAuth));
+        assertThrows(IllegalArgumentException.class, () -> trainerService.loginForTrainer(wrongPasswordAuth));
 
         verify(trainerRepository).findByUsername(trainerAuth.username());
     }
@@ -121,6 +115,45 @@ class TrainerServiceTest {
 
         verify(trainerRepository, times(2)).findByUsername(trainerAuth.username());
         verify(trainerRepository).save(any(Trainer.class));
+    }
+
+    @Test
+    public void testChangePassword(){
+        when(trainerRepository.findByUsername(trainerAuth.username())).thenReturn(Optional.ofNullable(trainer));
+        when(trainerRepository.save(any(Trainer.class))).thenReturn(trainer);
+
+        String newPassword = "newPassword123";
+
+        Trainer changedPassword = trainerService.changePassword(trainerAuth, newPassword);
+
+        assertNotNull(changedPassword);
+        assertEquals(newPassword, changedPassword.getPassword());
+
+        verify(trainerRepository, times(2)).findByUsername(trainerAuth.username());
+    }
+
+    @Test
+    public void testChangePasswordWrongPasswordLength(){
+        when(trainerRepository.findByUsername(trainerAuth.username())).thenReturn(Optional.ofNullable(trainer));
+
+        String newPasswordThatShort = "newPass";
+
+        assertThrows(IllegalArgumentException.class, () -> trainerService.changePassword(trainerAuth, newPasswordThatShort));
+
+        verify(trainerRepository, times(2)).findByUsername(trainerAuth.username());
+        verify(trainerRepository, never()).save(any(Trainer.class));
+    }
+
+    @Test
+    public void testChangePasswordRepeatsOldPassword(){
+        when(trainerRepository.findByUsername(trainerAuth.username())).thenReturn(Optional.ofNullable(trainer));
+
+        String newPasswordThatRepeatsOld = "password123";
+
+        assertThrows(IllegalArgumentException.class, () -> trainerService.changePassword(trainerAuth, newPasswordThatRepeatsOld));
+
+        verify(trainerRepository, times(2)).findByUsername(trainerAuth.username());
+        verify(trainerRepository, never()).save(any(Trainer.class));
     }
 
     @Test
