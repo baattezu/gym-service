@@ -11,6 +11,10 @@ import java.util.Objects;
 @Entity
 @Table(name = "users")
 @Inheritance(strategy = InheritanceType.JOINED)
+@NamedQuery(
+        name = "findUsernamesByBase",
+        query="SELECT user.username FROM User user WHERE user.username LIKE :baseUsername%"
+)
 public class User {
 
     @Id

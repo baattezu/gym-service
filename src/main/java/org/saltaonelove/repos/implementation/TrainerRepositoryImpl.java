@@ -27,7 +27,6 @@ public class TrainerRepositoryImpl implements TrainerRepository {
     private EntityManager entityManager;
 
     @Override
-    @Transactional
     public Trainer save(Trainer trainer) {
         try {
             if (trainer.getUserId() == null) {
@@ -55,7 +54,7 @@ public class TrainerRepositoryImpl implements TrainerRepository {
                     .setParameter("username", username)
                     .getSingleResult());
         } catch (NoResultException e) {
-            return Optional.empty();
+            throw new IllegalArgumentException("Could not find trainer with username: " + username);
         } catch (Exception e) {
             log.error("Unexpected error while fetching trainee: {}", e.getMessage(), e);
             throw e;
@@ -126,7 +125,6 @@ public class TrainerRepositoryImpl implements TrainerRepository {
     }
 
     @Override
-    @Transactional
     public void delete(Long id) {
         Trainer trainer = entityManager.find(Trainer.class, id);
         if (trainer != null) {

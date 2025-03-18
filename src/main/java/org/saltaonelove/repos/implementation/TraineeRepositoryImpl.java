@@ -27,7 +27,6 @@ public class TraineeRepositoryImpl implements TraineeRepository {
     private EntityManager entityManager;
 
     @Override
-    @Transactional
     public Trainee save(Trainee trainee) {
         try {
             if (trainee.getUserId() == null) {
@@ -55,7 +54,7 @@ public class TraineeRepositoryImpl implements TraineeRepository {
                     .setParameter("username", username)
                     .getSingleResult());
         } catch (NoResultException e) {
-            return Optional.empty();
+            throw new IllegalArgumentException("Could not find trainee with username: " + username);
         } catch (Exception e) {
             log.error("Unexpected error while fetching trainee: {}", e.getMessage(), e);
             throw e;
@@ -104,7 +103,6 @@ public class TraineeRepositoryImpl implements TraineeRepository {
     }
 
     @Override
-    @Transactional
     public void delete(Long id) {
         Trainee trainee = entityManager.find(Trainee.class, id);
         if (trainee != null) {

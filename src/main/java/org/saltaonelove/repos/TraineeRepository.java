@@ -1,7 +1,6 @@
 package org.saltaonelove.repos;
 
 import org.saltaonelove.model.Trainee;
-import org.saltaonelove.model.Trainer;
 import org.saltaonelove.model.Training;
 import org.springframework.stereotype.Repository;
 

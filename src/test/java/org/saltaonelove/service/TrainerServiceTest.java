@@ -61,15 +61,6 @@ class TrainerServiceTest {
     }
 
     @Test
-    void testLogin() {
-        when(trainerRepository.findByUsername(trainerAuth.username())).thenReturn(Optional.ofNullable(trainer));
-
-        trainerService.loginForTrainer(trainerAuth);
-
-        verify(trainerRepository).findByUsername(trainerAuth.username());
-    }
-
-    @Test
     public void testToggleActivationOfAccount() {
         boolean trainerActiveBefore = trainer.isActive();
 
@@ -82,20 +73,8 @@ class TrainerServiceTest {
 
         assertEquals(!trainerActiveBefore, newTrainer.isActive());
 
-        verify(trainerRepository, times(2)).findByUsername(trainerAuth.username());
-
-        verify(trainerRepository).save(any(Trainer.class));
-    }
-
-    @Test
-    void testLoginWrongPassword() {
-        AuthRequest wrongPasswordAuth = new AuthRequest(trainerAuth.username(), "1337S1mple");
-
-        when(trainerRepository.findByUsername(wrongPasswordAuth.username())).thenReturn(Optional.ofNullable(trainer));
-
-        assertThrows(IllegalArgumentException.class, () -> trainerService.loginForTrainer(wrongPasswordAuth));
-
         verify(trainerRepository).findByUsername(trainerAuth.username());
+        verify(trainerRepository).save(any(Trainer.class));
     }
 
     @Test
@@ -113,7 +92,7 @@ class TrainerServiceTest {
         assertEquals("Down", result.getLastName());
         assertEquals("Cardio", result.getSpecialization().getName());
 
-        verify(trainerRepository, times(2)).findByUsername(trainerAuth.username());
+        verify(trainerRepository).findByUsername(trainerAuth.username());
         verify(trainerRepository).save(any(Trainer.class));
     }
 
@@ -129,7 +108,7 @@ class TrainerServiceTest {
         assertNotNull(changedPassword);
         assertEquals(newPassword, changedPassword.getPassword());
 
-        verify(trainerRepository, times(2)).findByUsername(trainerAuth.username());
+        verify(trainerRepository).findByUsername(trainerAuth.username());
     }
 
     @Test
@@ -140,7 +119,7 @@ class TrainerServiceTest {
 
         assertThrows(IllegalArgumentException.class, () -> trainerService.changePassword(trainerAuth, newPasswordThatShort));
 
-        verify(trainerRepository, times(2)).findByUsername(trainerAuth.username());
+        verify(trainerRepository).findByUsername(trainerAuth.username());
         verify(trainerRepository, never()).save(any(Trainer.class));
     }
 
@@ -152,14 +131,13 @@ class TrainerServiceTest {
 
         assertThrows(IllegalArgumentException.class, () -> trainerService.changePassword(trainerAuth, newPasswordThatRepeatsOld));
 
-        verify(trainerRepository, times(2)).findByUsername(trainerAuth.username());
+        verify(trainerRepository).findByUsername(trainerAuth.username());
         verify(trainerRepository, never()).save(any(Trainer.class));
     }
 
     @Test
     void testListTrainers() {
         when(trainerRepository.findAll()).thenReturn(List.of(trainer));
-        when(trainerRepository.findByUsername(trainerAuth.username())).thenReturn(Optional.ofNullable(trainer));
 
         List<Trainer> result = trainerService.listTrainers(trainerAuth);
 
@@ -178,6 +156,6 @@ class TrainerServiceTest {
         assertNotNull(result);
         assertEquals(2L, result.getUserId());
 
-        verify(trainerRepository, times(2)).findByUsername(trainerAuth.username());
+        verify(trainerRepository).findByUsername(trainerAuth.username());
     }
 }

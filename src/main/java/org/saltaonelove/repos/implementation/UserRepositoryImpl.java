@@ -4,8 +4,6 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.saltaonelove.model.User;
 import org.saltaonelove.repos.UserRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -13,7 +11,6 @@ import java.util.List;
 @Repository
 public class UserRepositoryImpl implements UserRepository {
 
-    private static final Logger log = LoggerFactory.getLogger(UserRepositoryImpl.class);
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -21,4 +18,11 @@ public class UserRepositoryImpl implements UserRepository {
     public List<User> findAll() {
         return entityManager.createQuery("SELECT u FROM User u", User.class).getResultList();
     }
+
+    @Override
+    public List<String> findUsernamesByBase(String baseUsername) {
+        return entityManager.createNamedQuery("findUsernamesByBase", String.class)
+                .setParameter("baseUsername", baseUsername).getResultList();
+    }
+
 }

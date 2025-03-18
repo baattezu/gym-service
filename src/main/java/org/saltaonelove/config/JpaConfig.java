@@ -38,7 +38,8 @@ public class JpaConfig {
             DataSource dataSource,
             @Value("${hibernate.hbm2ddl.auto}") String hbm2ddlAuto,
             @Value("${hibernate.dialect}") String dialect,
-            @Value("${hibernate.show_sql}") String showSqlBool
+            @Value("${hibernate.show_sql}") String showSqlBool,
+            @Value("${hibernate.validator.apply_to_ddl}") String applyToDdlBool
     ) {
         LocalContainerEntityManagerFactoryBean factoryBean = new LocalContainerEntityManagerFactoryBean();
         factoryBean.setDataSource(dataSource);
@@ -49,6 +50,7 @@ public class JpaConfig {
         hibernateProperties.setProperty("hibernate.hbm2ddl.auto", hbm2ddlAuto);
         hibernateProperties.setProperty("hibernate.dialect", dialect);
         hibernateProperties.setProperty("hibernate.show_sql", showSqlBool);
+        hibernateProperties.setProperty("hibernate.validator.apply_to_ddl", applyToDdlBool);
         factoryBean.setJpaProperties(hibernateProperties);
 
         return factoryBean;

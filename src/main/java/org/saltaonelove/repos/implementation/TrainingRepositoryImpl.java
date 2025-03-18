@@ -4,7 +4,6 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.saltaonelove.model.Training;
 import org.saltaonelove.repos.TrainingRepository;
-import org.saltaonelove.repos.TrainingTypeRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
@@ -21,7 +20,6 @@ public class TrainingRepositoryImpl implements TrainingRepository {
     private EntityManager entityManager;
 
     @Override
-    @Transactional
     public Training save(Training training) {
         try {
             if (training.getTrainingId() == null) {
@@ -47,7 +45,6 @@ public class TrainingRepositoryImpl implements TrainingRepository {
     }
 
     @Override
-    @Transactional
     public void delete(Long id) {
         Training training = entityManager.find(Training.class, id);
         if (training != null) {

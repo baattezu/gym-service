@@ -3,7 +3,6 @@ package org.saltaonelove.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
-import java.time.Duration;
 import java.time.LocalDate;
 
 @Entity
@@ -13,18 +12,24 @@ public class Training {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "training_id")
     private Long trainingId;
+
     @ManyToOne
-    @JoinColumn(name = "trainee_id", nullable = false)
+    @JoinColumn(name = "trainee_id")
+    @NotNull(message = "Trainee should not be null")
     private Trainee trainee;
+
     @ManyToOne
-    @JoinColumn(name = "trainer_id", nullable = false)
+    @JoinColumn(name = "trainer_id")
+    @NotNull(message = "Trainer should not be null")
     private Trainer trainer;
-    @Column(name = "training_name", nullable = false)
+
+    @Column(name = "training_name")
     @NotNull(message = "Training name should not be null")
     private String trainingName;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "training_type_id", nullable = false)
+    @JoinColumn(name = "training_type_id")
+    @NotNull(message = "Training Type should not be null")
     private TrainingType trainingType;
 
     @Column(name = "training_date")

@@ -78,15 +78,6 @@ class TraineeServiceTest {
     }
 
     @Test
-    void testLogin() {
-        when(traineeRepository.findByUsername(traineeAuth.username())).thenReturn(Optional.ofNullable(trainee));
-
-        traineeService.loginForTrainee(traineeAuth);
-
-        verify(traineeRepository).findByUsername(traineeAuth.username());
-    }
-
-    @Test
     public void testToggleActivationOfAccount() {
         boolean traineeActiveBefore = trainee.isActive();
 
@@ -99,26 +90,14 @@ class TraineeServiceTest {
 
         assertEquals(!traineeActiveBefore, newTrainee.isActive());
 
-        verify(traineeRepository, times(2)).findByUsername(traineeAuth.username());
+        verify(traineeRepository).findByUsername(traineeAuth.username());
 
         verify(traineeRepository).save(any(Trainee.class));
     }
 
     @Test
-    void testLoginWrongPassword() {
-        AuthRequest wrongPasswordAuth = new AuthRequest(traineeAuth.username(), "1337S1mple");
-
-        when(traineeRepository.findByUsername(wrongPasswordAuth.username())).thenReturn(Optional.ofNullable(trainee));
-
-        assertThrows(IllegalArgumentException.class, () -> traineeService.loginForTrainee(wrongPasswordAuth));
-
-        verify(traineeRepository).findByUsername(traineeAuth.username());
-    }
-
-    @Test
     void testListTrainees() {
         when(traineeRepository.findAll()).thenReturn(List.of(trainee));
-        when(traineeRepository.findByUsername(traineeAuth.username())).thenReturn(Optional.of(trainee));
 
         List<Trainee> result = traineeService.listTrainees(traineeAuth);
 
@@ -137,7 +116,7 @@ class TraineeServiceTest {
         assertNotNull(result);
         assertEquals(1L, result.getUserId());
 
-        verify(traineeRepository, times(2)).findByUsername(traineeAuth.username());
+        verify(traineeRepository).findByUsername(traineeAuth.username());
     }
 
     @Test
@@ -159,7 +138,7 @@ class TraineeServiceTest {
         assertEquals("New Address", result.getAddress());
         assertEquals(LocalDate.of(2001, 1, 1), result.getDateOfBirth());
 
-        verify(traineeRepository, times(2)).findByUsername(traineeAuth.username());
+        verify(traineeRepository).findByUsername(traineeAuth.username());
         verify(traineeRepository).save(any(Trainee.class));
     }
 
@@ -175,7 +154,7 @@ class TraineeServiceTest {
         assertNotNull(changedPassword);
         assertEquals(newPassword, changedPassword.getPassword());
 
-        verify(traineeRepository, times(2)).findByUsername(traineeAuth.username());
+        verify(traineeRepository).findByUsername(traineeAuth.username());
     }
 
     @Test
@@ -186,7 +165,7 @@ class TraineeServiceTest {
 
         assertThrows(IllegalArgumentException.class, () -> traineeService.changePassword(traineeAuth, newPasswordThatShort));
 
-        verify(traineeRepository, times(2)).findByUsername(traineeAuth.username());
+        verify(traineeRepository).findByUsername(traineeAuth.username());
         verify(traineeRepository, never()).save(any(Trainee.class));
     }
 
@@ -198,7 +177,7 @@ class TraineeServiceTest {
 
         assertThrows(IllegalArgumentException.class, () -> traineeService.changePassword(traineeAuth, newPasswordThatRepeatsOld));
 
-        verify(traineeRepository, times(2)).findByUsername(traineeAuth.username());
+        verify(traineeRepository).findByUsername(traineeAuth.username());
         verify(traineeRepository, never()).save(any(Trainee.class));
     }
 
@@ -214,7 +193,7 @@ class TraineeServiceTest {
         assertEquals(1, trainee.getTrainers().size());
         assertEquals(InitModels.initTrainer().getFirstName(), trainee.getTrainers().get(0).getFirstName());
 
-        verify(traineeRepository, times(2)).findByUsername(traineeAuth.username());
+        verify(traineeRepository).findByUsername(traineeAuth.username());
         verify(traineeRepository).save(any(Trainee.class));
     }
 }

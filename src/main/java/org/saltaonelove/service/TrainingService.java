@@ -23,15 +23,18 @@ import java.util.NoSuchElementException;
 public class TrainingService {
 
     private static final Logger log = LoggerFactory.getLogger(TrainingService.class);
-    @Autowired
-    private TraineeRepository traineeRepository;
-    @Autowired
-    private TrainerRepository trainerRepository;
-    @Autowired
-    private TrainingTypeRepository trainingTypeRepository;
 
-    @Autowired
+    private TraineeRepository traineeRepository;
+    private TrainerRepository trainerRepository;
+    private TrainingTypeRepository trainingTypeRepository;
     private TrainingRepository trainingRepository;
+
+    public TrainingService(TraineeRepository traineeRepository, TrainerRepository trainerRepository, TrainingTypeRepository trainingTypeRepository, TrainingRepository trainingRepository) {
+        this.traineeRepository = traineeRepository;
+        this.trainerRepository = trainerRepository;
+        this.trainingTypeRepository = trainingTypeRepository;
+        this.trainingRepository = trainingRepository;
+    }
 
     @Transactional
     public Training createTraining(TrainingDTO trainingDTO) {

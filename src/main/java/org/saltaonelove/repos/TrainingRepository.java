@@ -1,7 +1,5 @@
 package org.saltaonelove.repos;
 
-import jakarta.persistence.criteria.CriteriaBuilder;
-import org.saltaonelove.model.Trainee;
 import org.saltaonelove.model.Training;
 import org.springframework.stereotype.Repository;
 

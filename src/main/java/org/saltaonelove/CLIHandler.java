@@ -4,12 +4,10 @@ import org.saltaonelove.dto.AuthRequest;
 import org.saltaonelove.dto.TraineeDTO;
 import org.saltaonelove.dto.TrainerDTO;
 import org.saltaonelove.facade.GymFacade;
-import org.saltaonelove.model.Training;
 import org.saltaonelove.model.TrainingType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.LinkedHashMap;

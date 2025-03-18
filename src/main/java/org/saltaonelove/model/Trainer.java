@@ -14,7 +14,7 @@ import java.util.List;
 )
 public class Trainer extends User {
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "specialization", referencedColumnName = "training_type_id", nullable = false)
+    @JoinColumn(name = "specialization", referencedColumnName = "training_type_id")
     @NotNull(message = "Specialization should not be null")
     private TrainingType specialization;
 
