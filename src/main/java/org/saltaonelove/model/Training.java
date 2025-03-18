@@ -1,41 +1,52 @@
 package org.saltaonelove.model;
 
-import java.time.Duration;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+
 import java.time.LocalDate;
-import java.time.LocalTime;
 
+@Entity
+@Table(name = "training")
 public class Training {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "training_id")
     private Long trainingId;
-    private Long trainerId;
-    private Long traineeId;
-    private String name;
-    private TrainingType trainingType;
-    private LocalDate date;
-    private Duration duration;
 
-    public Training(Long trainerId, Long traineeId, String name, TrainingType trainingType, LocalDate date, Duration duration) {
-        this.trainerId = trainerId;
-        this.traineeId = traineeId;
-        this.name = name;
-        this.trainingType = trainingType;
-        this.date = date;
-        this.duration = duration;
-    }
+    @ManyToOne
+    @JoinColumn(name = "trainee_id")
+    @NotNull(message = "Trainee should not be null")
+    private Trainee trainee;
+
+    @ManyToOne
+    @JoinColumn(name = "trainer_id")
+    @NotNull(message = "Trainer should not be null")
+    private Trainer trainer;
+
+    @Column(name = "training_name")
+    @NotNull(message = "Training name should not be null")
+    private String trainingName;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "training_type_id")
+    @NotNull(message = "Training Type should not be null")
+    private TrainingType trainingType;
+
+    @Column(name = "training_date")
+    @NotNull(message = "Date of training should not be null")
+    private LocalDate date;
+
+    @Column(name = "training_duration")
+    @NotNull(message = "Duration of training should not be null")
+    private Long duration;
 
     public Training() {
     }
 
     @Override
     public String toString() {
-        return "Training{ \n" +
-                "trainingId=" + trainingId +
-                ",\n trainerId=" + trainerId +
-                ",\n traineeId=" + traineeId +
-                ",\n name='" + name + '\'' +
-                ",\n trainingType=" + trainingType.getName() +
-                ",\n date=" + date +
-                ",\n duration=" + duration +
-                '}';
+        return String.format("Training { Training Id: %s | Trainer: %s | Trainee: %s | Name: %s | Training Type: %s | Date: %s | Duration: %s }",
+                trainingId, trainer.getUsername(), trainee.getUsername(), trainingName, trainingType.getName(), date, duration);
     }
 
     public Long getTrainingId() {
@@ -46,28 +57,28 @@ public class Training {
         this.trainingId = trainingId;
     }
 
-    public Long getTrainerId() {
-        return trainerId;
+    public Trainee getTrainee() {
+        return trainee;
     }
 
-    public void setTrainerId(Long trainerId) {
-        this.trainerId = trainerId;
+    public void setTrainee(Trainee trainee) {
+        this.trainee = trainee;
     }
 
-    public Long getTraineeId() {
-        return traineeId;
+    public Trainer getTrainer() {
+        return trainer;
     }
 
-    public void setTraineeId(Long traineeId) {
-        this.traineeId = traineeId;
+    public void setTrainer(Trainer trainer) {
+        this.trainer = trainer;
     }
 
-    public String getName() {
-        return name;
+    public String getTrainingName() {
+        return trainingName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setTrainingName(String trainingName) {
+        this.trainingName = trainingName;
     }
 
     public TrainingType getTrainingType() {
@@ -86,11 +97,11 @@ public class Training {
         this.date = date;
     }
 
-    public Duration getDuration() {
+    public Long getDuration() {
         return duration;
     }
 
-    public void setDuration(Duration duration) {
+    public void setDuration(Long duration) {
         this.duration = duration;
     }
 }

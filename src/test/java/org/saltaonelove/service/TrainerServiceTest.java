@@ -6,11 +6,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.saltaonelove.dao.TrainerDAO;
+import org.saltaonelove.InitModels;
+import org.saltaonelove.dto.AuthRequest;
 import org.saltaonelove.dto.TrainerDTO;
 import org.saltaonelove.model.Trainer;
+import org.saltaonelove.repos.TrainerRepository;
+import org.saltaonelove.repos.TrainingTypeRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -19,7 +23,9 @@ import static org.mockito.Mockito.*;
 class TrainerServiceTest {
 
     @Mock
-    private TrainerDAO trainerDAO;
+    private TrainerRepository trainerRepository;
+    @Mock
+    private TrainingTypeRepository trainingTypeRepository;
 
     @Mock
     private UserCredentialsService userUtil;
@@ -28,71 +34,128 @@ class TrainerServiceTest {
     private TrainerService trainerService;
 
     private Trainer trainer;
+    private AuthRequest trainerAuth;
 
     @BeforeEach
     void setUp() {
-        trainer = new Trainer("John", "Doe");
-        trainer.setUserId(1L);
-        trainer.setTrainerId(1L);
-        trainer.setSpecialization("Strength Training");
+        trainer = InitModels.initTrainer();
+        trainerAuth = new AuthRequest(trainer.getUsername(), trainer.getPassword());
     }
 
     @Test
     void testRegisterTrainer() {
-        when(userUtil.generateUsername(any(Trainer.class))).thenReturn("John.Doe");
-        when(trainerDAO.save(any(Trainer.class))).thenReturn(trainer);
+        TrainerDTO trainerDTO = new TrainerDTO("Jane", "Doe", "Cardio");
 
-        Trainer result = trainerService.registerTrainer(new TrainerDTO("John", "Doe"));
+        when(trainingTypeRepository.findByName(trainerDTO.specialization())).thenReturn(Optional.of(InitModels.initTrainingType()));
+        when(userUtil.generateUsername(any(Trainer.class))).thenReturn("Jane.Doe");
+        when(trainerRepository.save(any(Trainer.class))).thenReturn(trainer);
+
+        Trainer result = trainerService.registerTrainer(trainerDTO);
 
         assertNotNull(result);
-        assertEquals("John", result.getFirstName());
+        assertEquals("Jane", result.getFirstName());
         assertEquals("Doe", result.getLastName());
+        assertEquals("Cardio", result.getSpecialization().getName());
 
-        verify(trainerDAO).save(any(Trainer.class));
+        verify(trainerRepository).save(any(Trainer.class));
     }
 
     @Test
-    void testRegisterTrainerWithSpecialization() {
-        when(userUtil.generateUsername(any(Trainer.class))).thenReturn("John.Doe");
-        when(trainerDAO.save(any(Trainer.class))).thenReturn(trainer);
+    public void testToggleActivationOfAccount() {
+        boolean trainerActiveBefore = trainer.isActive();
 
-        Trainer result = trainerService.registerTrainer(new TrainerDTO("John", "Doe", "Strength Training"));
+        when(trainerRepository.findByUsername(trainerAuth.username())).thenReturn(Optional.of(trainer));
+        when(trainerRepository.save(any(Trainer.class))).thenReturn(trainer);
 
-        assertNotNull(result);
-        assertEquals("John", result.getFirstName());
-        assertEquals("Doe", result.getLastName());
-        assertEquals("Strength Training", result.getSpecialization());
+        Trainer newTrainer = trainerService.toggleActivationOfAccount(trainerAuth);
 
-        verify(trainerDAO).save(any(Trainer.class));
+        assertNotNull(newTrainer);
+
+        assertEquals(!trainerActiveBefore, newTrainer.isActive());
+
+        verify(trainerRepository).findByUsername(trainerAuth.username());
+        verify(trainerRepository).save(any(Trainer.class));
     }
 
     @Test
     void testUpdateTrainer() {
-        TrainerDTO trainerDTO = new TrainerDTO("NewName", "NewLastName", "Cardio");
+        TrainerDTO updTrainerDTO = new TrainerDTO("Jane", "Down", "Cardio");
 
-        when(trainerDAO.findById(1L)).thenReturn(trainer);
-        when(trainerDAO.save(any(Trainer.class))).thenReturn(trainer);
+        when(trainingTypeRepository.findByName(updTrainerDTO.specialization())).thenReturn(Optional.of(InitModels.initTrainingType()));
+        when(trainerRepository.findByUsername(trainerAuth.username())).thenReturn(Optional.of(trainer));
+        when(trainerRepository.save(any(Trainer.class))).thenReturn(trainer);
 
-        Trainer result = trainerService.updateTrainer(1L, trainerDTO);
+        Trainer result = trainerService.updateTrainer(trainerAuth, updTrainerDTO);
 
         assertNotNull(result);
-        assertEquals("NewName", result.getFirstName());
-        assertEquals("NewLastName", result.getLastName());
-        assertEquals("Cardio", result.getSpecialization());
+        assertEquals("Jane", result.getFirstName());
+        assertEquals("Down", result.getLastName());
+        assertEquals("Cardio", result.getSpecialization().getName());
 
-        verify(trainerDAO).findById(1L);
-        verify(trainerDAO).save(any(Trainer.class));
+        verify(trainerRepository).findByUsername(trainerAuth.username());
+        verify(trainerRepository).save(any(Trainer.class));
+    }
+
+    @Test
+    public void testChangePassword(){
+        when(trainerRepository.findByUsername(trainerAuth.username())).thenReturn(Optional.ofNullable(trainer));
+        when(trainerRepository.save(any(Trainer.class))).thenReturn(trainer);
+
+        String newPassword = "newPassword123";
+
+        Trainer changedPassword = trainerService.changePassword(trainerAuth, newPassword);
+
+        assertNotNull(changedPassword);
+        assertEquals(newPassword, changedPassword.getPassword());
+
+        verify(trainerRepository).findByUsername(trainerAuth.username());
+    }
+
+    @Test
+    public void testChangePasswordWrongPasswordLength(){
+        when(trainerRepository.findByUsername(trainerAuth.username())).thenReturn(Optional.ofNullable(trainer));
+
+        String newPasswordThatShort = "newPass";
+
+        assertThrows(IllegalArgumentException.class, () -> trainerService.changePassword(trainerAuth, newPasswordThatShort));
+
+        verify(trainerRepository).findByUsername(trainerAuth.username());
+        verify(trainerRepository, never()).save(any(Trainer.class));
+    }
+
+    @Test
+    public void testChangePasswordRepeatsOldPassword(){
+        when(trainerRepository.findByUsername(trainerAuth.username())).thenReturn(Optional.ofNullable(trainer));
+
+        String newPasswordThatRepeatsOld = "password123";
+
+        assertThrows(IllegalArgumentException.class, () -> trainerService.changePassword(trainerAuth, newPasswordThatRepeatsOld));
+
+        verify(trainerRepository).findByUsername(trainerAuth.username());
+        verify(trainerRepository, never()).save(any(Trainer.class));
     }
 
     @Test
     void testListTrainers() {
-        when(trainerDAO.findAll()).thenReturn(List.of(trainer));
+        when(trainerRepository.findAll()).thenReturn(List.of(trainer));
 
-        List<Trainer> result = trainerService.listTrainers();
+        List<Trainer> result = trainerService.listTrainers(trainerAuth);
 
         assertFalse(result.isEmpty());
         assertEquals(1, result.size());
 
-        verify(trainerDAO).findAll();
+        verify(trainerRepository).findAll();
+    }
+
+    @Test
+    void testShowTrainerProfile() {
+        when(trainerRepository.findByUsername(trainerAuth.username())).thenReturn(Optional.of(trainer));
+
+        Trainer result = trainerService.showProfile(trainerAuth);
+
+        assertNotNull(result);
+        assertEquals(2L, result.getUserId());
+
+        verify(trainerRepository).findByUsername(trainerAuth.username());
     }
 }

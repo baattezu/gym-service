@@ -1,20 +1,41 @@
 package org.saltaonelove.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import jakarta.annotation.Nonnull;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 
 import java.util.Objects;
 
+
+@Entity
+@Table(name = "users")
+@Inheritance(strategy = InheritanceType.JOINED)
+@NamedQuery(
+        name = "findUsernamesByBase",
+        query="SELECT user.username FROM User user WHERE user.username LIKE :baseUsername%"
+)
 public class User {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id")
     private Long userId;
-
+    @Column(name = "first_name")
+    @NotNull(message = "First name should not be null")
     private String firstName;
+    @Column(name = "last_name")
+    @NotNull(message = "Last name should not be null")
     private String lastName;
+    @Column(name = "username")
+    @NotNull(message = "Username should not be null")
     private String username;
+    @Column(name = "password")
+    @NotNull(message = "Password should not be null")
+    @Min(value = 10, message = "Password should be at least 10 characters")
     private String password;
-
-    @JsonProperty("isActive")
+    @Column(name = "is_active")
+    @NotNull(message = "Activation field should not be null")
     private boolean isActive;
 
     public User() {
@@ -30,14 +51,7 @@ public class User {
 
     @Override
     public String toString() {
-        return "User{" +
-                "userId=" + userId +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", username='" + username + '\'' +
-                ", password='" + password + '\'' +
-                ", isActive=" + isActive +
-                '}';
+        return String.format("User { User ID: %s | Username: %s | First Name: %s | Last Name: %s | IsActive: %s }", userId, username, firstName, lastName, isActive);
     }
 
     @Override

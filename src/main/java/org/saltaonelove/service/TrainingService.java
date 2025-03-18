@@ -1,53 +1,81 @@
 package org.saltaonelove.service;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.annotation.PostConstruct;
-import org.saltaonelove.dao.TrainingDAO;
-import org.saltaonelove.dao.TrainingTypeDAO;
+import jakarta.persistence.EntityNotFoundException;
+import org.saltaonelove.dto.TrainingDTO;
+import org.saltaonelove.model.Trainee;
+import org.saltaonelove.model.Trainer;
 import org.saltaonelove.model.Training;
 import org.saltaonelove.model.TrainingType;
-import org.saltaonelove.model.User;
+import org.saltaonelove.repos.TraineeRepository;
+import org.saltaonelove.repos.TrainerRepository;
+import org.saltaonelove.repos.TrainingRepository;
+import org.saltaonelove.repos.TrainingTypeRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
 import java.util.List;
-import java.util.Map;
+import java.util.NoSuchElementException;
 
 @Service
 public class TrainingService {
 
-    @Autowired
-    private TrainingDAO trainingDAO;
-    @Autowired
-    private TrainingTypeDAO trainingTypeDAO;
+    private static final Logger log = LoggerFactory.getLogger(TrainingService.class);
 
-    public Training addTrainingType(Training training, String trainingTypeName) {
-        TrainingType trainingType = new TrainingType(trainingTypeName);
-        if (trainingTypeDAO.findAll().stream().anyMatch(t -> t.getName()
-                .equals(trainingType.getName()))) {
-            training.setTrainingType(trainingType);
-        } else {
-            trainingTypeDAO.save(trainingType);
-            training.setTrainingType(trainingType);
-        }
+    private TraineeRepository traineeRepository;
+    private TrainerRepository trainerRepository;
+    private TrainingTypeRepository trainingTypeRepository;
+    private TrainingRepository trainingRepository;
+
+    public TrainingService(TraineeRepository traineeRepository, TrainerRepository trainerRepository, TrainingTypeRepository trainingTypeRepository, TrainingRepository trainingRepository) {
+        this.traineeRepository = traineeRepository;
+        this.trainerRepository = trainerRepository;
+        this.trainingTypeRepository = trainingTypeRepository;
+        this.trainingRepository = trainingRepository;
+    }
+
+    @Transactional
+    public Training createTraining(TrainingDTO trainingDTO) {
+        log.info("Creating training {}", trainingDTO);
+        Training training = new Training();
+
+        Trainer trainer = trainerRepository.findById(trainingDTO.trainerId())
+                .orElseThrow(() -> new EntityNotFoundException("Trainer not found with ID: " + trainingDTO.trainerId()));
+
+        Trainee trainee = traineeRepository.findById(trainingDTO.traineeId())
+                .orElseThrow(() -> new EntityNotFoundException("Trainee not found with ID: " + trainingDTO.traineeId()));
+
+        TrainingType trainingType = trainingTypeRepository.findById(trainingDTO.trainingTypeId())
+                .orElseThrow(() -> new EntityNotFoundException("TrainingType not found with ID: " + trainingDTO.trainingTypeId()));
+
+        training.setTrainee(trainee);
+        training.setTrainer(trainer);
+        training.setTrainingName(trainingDTO.trainingName());
+        training.setTrainingType(trainingType);
+        training.setDate(trainingDTO.date());
+        training.setDuration(trainingDTO.duration());
+
+        training = trainingRepository.save(training);
+        log.info("Created training {}", trainingDTO);
         return training;
     }
 
-    public Training createTraining(Training training) {
-        return trainingDAO.save(training);
-    }
-
     public List<Training> listTrainings() {
-        return trainingDAO.findAll();
+        log.info("Listing trainings");
+        return trainingRepository.findAll();
     }
 
     public Training getTraining(Long id) {
-        return trainingDAO.get(id);
+        log.info("Fetching training {}", id);
+        return trainingRepository.findById(id).orElseThrow(
+                () -> new NoSuchElementException("Training with id " + id + " not found"));
+    }
+
+    public List<TrainingType> getTrainingTypes() {
+        log.info("Fetching trainingTypes");
+        return trainingTypeRepository.findAll();
     }
 
 }
