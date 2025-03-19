@@ -57,6 +57,7 @@ public class TrainingService {
         training.setDate(trainingDTO.date());
         training.setDuration(trainingDTO.duration());
 
+        log.info("Training {} creates", trainingDTO);
         training = trainingRepository.save(training);
         log.info("Created training {}", trainingDTO);
         return training;

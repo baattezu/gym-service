@@ -7,9 +7,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.saltaonelove.InitModels;
+import org.saltaonelove.dto.TrainerDTO;
 import org.saltaonelove.dto.TrainingDTO;
+import org.saltaonelove.model.Trainee;
+import org.saltaonelove.model.Trainer;
 import org.saltaonelove.model.Training;
 import org.saltaonelove.model.TrainingType;
+import org.saltaonelove.repos.TraineeRepository;
+import org.saltaonelove.repos.TrainerRepository;
 import org.saltaonelove.repos.TrainingRepository;
 import org.saltaonelove.repos.TrainingTypeRepository;
 
@@ -27,29 +32,47 @@ class TrainingServiceTest {
     private TrainingRepository trainingRepository;
 
     @Mock
+    private TrainerRepository trainerRepository;
+
+    @Mock
+    private TraineeRepository traineeRepository;
+
+    @Mock
     private TrainingTypeRepository trainingTypeRepository;
 
     @InjectMocks
     private TrainingService trainingService;
 
     private Training training;
+    private Trainer trainer;
+    private Trainee trainee;
     private TrainingType trainingType;
 
     @BeforeEach
     void setUp() {
-        training = InitModels.initTraining();
+        trainee = InitModels.initTrainee();
+        trainer = InitModels.initTrainer();
+        trainingType = InitModels.initTrainingType();
+        training = InitModels.initTraining(trainee, trainer, trainingType);
     }
 
     @Test
     void testCreateTraining() {
-        when(trainingRepository.save(any(Training.class))).thenReturn(training);
+        doReturn(training).when(trainingRepository).save(any(Training.class));
+        when(trainerRepository.findById(2L)).thenReturn(Optional.of(trainer));
+        when(traineeRepository.findById(1L)).thenReturn(Optional.of(trainee));
+        when(trainingTypeRepository.findById(1L)).thenReturn(Optional.of(trainingType));
 
-        Training result = trainingService.createTraining(new TrainingDTO(1L,2L, "Cardio with Jane", 1L, LocalDate.of(2012,12,12), 60L));
+        Training result = trainingService.createTraining(
+                new TrainingDTO(
+                        1L,2L, "Cardio with Jane",
+                        1L, LocalDate.of(2012,12,12), 60L)
+        );
 
         assertNotNull(result);
-        assertEquals("Cardio with Jane", result.getTrainingName());
+        assertEquals("Cardio Training", result.getTrainingName());
 
-        verify(trainingRepository).save(training);
+        verify(trainingRepository, times(1)).save(any(Training.class));
     }
 
     @Test

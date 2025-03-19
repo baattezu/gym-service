@@ -14,11 +14,9 @@ import org.saltaonelove.model.User;
 import org.saltaonelove.repos.UserRepository;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Supplier;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -31,18 +29,15 @@ class UserCredentialsServiceTest {
     private UserCredentialsService userCredentialsService;
 
     private Trainee trainee;
-    private Trainer trainer;
 
     @BeforeEach
     void setUp() {
         trainee = InitModels.initTrainee();
-        trainer = InitModels.initTrainer();
     }
 
     @Test
     void generateUsername_noConflicts_returnsBaseUsername() {
         User user = new User("John", "Doe");
-        when(userRepository.findAll()).thenReturn(List.of());
 
         String username = userCredentialsService.generateUsername(user);
 
