@@ -43,10 +43,11 @@ public class InitModels {
 
     public static Training initTraining(Trainee trainee, Trainer trainer, TrainingType trainingType){
         Training training = new Training();
+        training.setTrainingId(1L);
         training.setTrainingType(trainingType);
         training.setTrainee(trainee);
         training.setTrainer(trainer);
-        training.setTrainingName(trainingType.getName() + " with trainer " + trainer.getUsername());
+        training.setTrainingName(trainingType.getName() + " Training");
         training.setDate(LocalDate.of(2012,12,12));
         training.setDuration(60L);
         return training;
