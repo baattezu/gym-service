@@ -50,7 +50,7 @@ public class TraineeRepositoryImpl implements TraineeRepository {
     public Optional<Trainee> findByUsername(String username) {
         try {
             return Optional.of(entityManager
-                    .createNamedQuery("findTrainee_ByUsername", Trainee.class)
+                    .createNamedQuery("Trainee.findByUsername", Trainee.class)
                     .setParameter("username", username)
                     .getSingleResult());
         } catch (NoResultException e) {
@@ -101,6 +101,27 @@ public class TraineeRepositoryImpl implements TraineeRepository {
 
         return entityManager.createQuery(query).getResultList();
     }
+
+//    @Override
+//    public List<Trainer> findTrainersThatAreNotAssignedToTrainee(String traineeUsername) {
+//        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+//
+//        CriteriaQuery<Trainer> query = cb.createQuery(Trainer.class);
+//        Root<Trainer> trainer = query.from(Trainer.class);
+//
+//        Subquery<Long> assignedTrainersSubquery = query.subquery(Long.class);
+//        Root<Trainee> traineeRoot = assignedTrainersSubquery.from(Trainee.class);
+//
+//        Join<Trainee, Trainer> assignedTrainers = traineeRoot.join("trainers");
+//
+//        assignedTrainersSubquery.select(assignedTrainers.get("userId"))
+//                .where(cb.equal(traineeRoot.get("username"), traineeUsername));
+//
+//        query.select(trainer)
+//                .where(cb.not(trainer.get("userId").in(assignedTrainersSubquery)));
+//
+//        return entityManager.createQuery(query).getResultList();
+//    }
 
     @Override
     public void delete(Long id) {

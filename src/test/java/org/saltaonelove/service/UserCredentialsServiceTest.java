@@ -7,16 +7,19 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.saltaonelove.InitModels;
-import org.saltaonelove.dto.AuthRequest;
+import org.saltaonelove.dto.auth.AuthRequest;
+import org.saltaonelove.dto.auth.ChangeLoginRequest;
 import org.saltaonelove.model.Trainee;
 import org.saltaonelove.model.Trainer;
 import org.saltaonelove.model.User;
 import org.saltaonelove.repos.UserRepository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -87,6 +90,32 @@ class UserCredentialsServiceTest {
         Supplier<Trainee> identityProvider = () -> trainee;
 
         assertThrows(IllegalArgumentException.class, () -> trainee = userCredentialsService.authorize(authRequest, identityProvider));
+    }
+
+    @Test
+    void testChangePasswordInUserCredentialsService() {
+        AuthRequest authRequest = new AuthRequest(trainee.getUsername(), trainee.getPassword());
+        ChangeLoginRequest changeLoginRequest = new ChangeLoginRequest(authRequest.username(), authRequest.password(), "NewPassword");
+
+        when(userRepository.findByUsername(trainee.getUsername())).thenReturn(Optional.of(trainee));
+        when(userRepository.save(trainee)).thenReturn(trainee);
+
+        User user = userCredentialsService.changeLogin(authRequest.username(), changeLoginRequest);
+
+        assertNotNull(user);
+        assertEquals("NewPassword", user.getPassword());
+
+        verify(userRepository).save(trainee);
+    }
+
+    @Test
+    void testChangePasswordInUserCredentialsServiceOldPasswordIsWrong() {
+        AuthRequest authRequest = new AuthRequest(trainee.getUsername(), trainee.getPassword());
+        ChangeLoginRequest changeLoginRequest = new ChangeLoginRequest(authRequest.username(), "WrongOldPassword", "NewPassword");
+
+        when(userRepository.findByUsername(trainee.getUsername())).thenReturn(Optional.of(trainee));
+
+        assertThrows(IllegalArgumentException.class, () -> userCredentialsService.changeLogin(authRequest.username(), changeLoginRequest));
     }
 
 }

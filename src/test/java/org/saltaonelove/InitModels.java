@@ -6,6 +6,7 @@ import org.saltaonelove.model.Training;
 import org.saltaonelove.model.TrainingType;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public class InitModels {
 
@@ -19,6 +20,7 @@ public class InitModels {
         trainee.setDateOfBirth("2001-01-01");
         trainee.setAddress("address1");
         trainee.setActive(true);
+        trainee.setTrainers(List.of());
         return trainee;
     }
 
@@ -38,6 +40,7 @@ public class InitModels {
         trainer.setPassword("password123");
         trainer.setSpecialization(initTrainingType());
         trainer.setActive(true);
+        trainer.setTrainees(List.of());
         return trainer;
     }
 

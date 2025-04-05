@@ -1,7 +1,8 @@
 package org.saltaonelove.service;
 
 import jakarta.persistence.EntityNotFoundException;
-import org.saltaonelove.dto.TrainingDTO;
+import org.saltaonelove.dto.training.TrainingDTO;
+import org.saltaonelove.dto.training.TrainingRequest;
 import org.saltaonelove.model.Trainee;
 import org.saltaonelove.model.Trainer;
 import org.saltaonelove.model.Training;
@@ -10,9 +11,9 @@ import org.saltaonelove.repos.TraineeRepository;
 import org.saltaonelove.repos.TrainerRepository;
 import org.saltaonelove.repos.TrainingRepository;
 import org.saltaonelove.repos.TrainingTypeRepository;
+import org.saltaonelove.util.logging.annotation.TransactionalWithLogging;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,25 +37,22 @@ public class TrainingService {
         this.trainingRepository = trainingRepository;
     }
 
-    @Transactional
-    public Training createTraining(TrainingDTO trainingDTO) {
+    @TransactionalWithLogging
+    public Training createTraining(TrainingRequest trainingDTO) {
         log.info("Creating training {}", trainingDTO);
         Training training = new Training();
 
-        Trainer trainer = trainerRepository.findById(trainingDTO.trainerId())
-                .orElseThrow(() -> new EntityNotFoundException("Trainer not found with ID: " + trainingDTO.trainerId()));
+        Trainer trainer = trainerRepository.findByUsername(trainingDTO.trainerUsername())
+                .orElseThrow(() -> new EntityNotFoundException("Trainer not found: " + trainingDTO.trainerUsername()));
 
-        Trainee trainee = traineeRepository.findById(trainingDTO.traineeId())
-                .orElseThrow(() -> new EntityNotFoundException("Trainee not found with ID: " + trainingDTO.traineeId()));
-
-        TrainingType trainingType = trainingTypeRepository.findById(trainingDTO.trainingTypeId())
-                .orElseThrow(() -> new EntityNotFoundException("TrainingType not found with ID: " + trainingDTO.trainingTypeId()));
+        Trainee trainee = traineeRepository.findByUsername(trainingDTO.traineeUsername())
+                .orElseThrow(() -> new EntityNotFoundException("Trainee not found: " + trainingDTO.traineeUsername()));
 
         training.setTrainee(trainee);
         training.setTrainer(trainer);
         training.setTrainingName(trainingDTO.trainingName());
-        training.setTrainingType(trainingType);
-        training.setDate(trainingDTO.date());
+        training.setTrainingType(trainer.getSpecialization());
+        training.setDate(trainingDTO.trainingDate());
         training.setDuration(trainingDTO.duration());
 
         training = trainingRepository.save(training);

@@ -50,15 +50,20 @@ public class TrainerRepositoryImpl implements TrainerRepository {
     public Optional<Trainer> findByUsername(String username) {
         try {
             return Optional.of(entityManager
-                    .createNamedQuery("findTrainer_ByUsername", Trainer.class)
+                    .createNamedQuery("Trainer.findByUsername", Trainer.class)
                     .setParameter("username", username)
                     .getSingleResult());
         } catch (NoResultException e) {
             throw new IllegalArgumentException("Could not find trainer with username: " + username);
         } catch (Exception e) {
-            log.error("Unexpected error while fetching trainee: {}", e.getMessage(), e);
+            log.error("Unexpected error while fetching trainer: {}", e.getMessage(), e);
             throw e;
         }
+    }
+
+    @Override
+    public List<Trainer> findByUsernames(List<String> usernames) {
+        return entityManager.createNamedQuery("Trainer.findByUsernames", Trainer.class).setParameter("usernames", usernames).getResultList();
     }
 
     @Override
@@ -97,7 +102,6 @@ public class TrainerRepositoryImpl implements TrainerRepository {
         return entityManager.createQuery(query).getResultList();
     }
 
-    @Override
     public List<Trainer> findTrainersThatAreNotAssignedToTrainee(String traineeUsername) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
 

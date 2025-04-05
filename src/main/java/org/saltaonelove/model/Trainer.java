@@ -2,16 +2,26 @@ package org.saltaonelove.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
 @Entity
 @Table(name = "trainer")
 @PrimaryKeyJoinColumn(name = "trainer_id", referencedColumnName = "user_id")
-@NamedQuery(
-        name="findTrainer_ByUsername",
-        query="SELECT tr FROM Trainer tr WHERE tr.username LIKE :username"
-)
+@NamedQueries({
+        @NamedQuery(
+                name="Trainer.findByUsername",
+                query="SELECT tr FROM Trainer tr WHERE tr.username LIKE :username"
+        ),
+        @NamedQuery(
+                name="Trainer.findByUsernames",
+                query="SELECT tr FROM Trainer tr WHERE tr.username IN :usernames"
+        )
+})
+@Getter
+@Setter
 public class Trainer extends User {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "specialization", referencedColumnName = "training_type_id")
@@ -42,29 +52,5 @@ public class Trainer extends User {
                 "Trainer { Trainer ID: %s | Username: %s | First Name: %s | Last Name: %s | Specialization: %s }",
                 getUserId(), getUsername(), getFirstName(), getLastName(), specialization.getName()
         );
-    }
-
-    public TrainingType getSpecialization() {
-        return specialization;
-    }
-
-    public void setSpecialization(TrainingType specialization) {
-        this.specialization = specialization;
-    }
-
-    public List<Trainee> getTrainees() {
-        return trainees;
-    }
-
-    public void setTrainees(List<Trainee> trainees) {
-        this.trainees = trainees;
-    }
-
-    public List<Training> getTrainings() {
-        return trainings;
-    }
-
-    public void setTrainings(List<Training> trainings) {
-        this.trainings = trainings;
     }
 }

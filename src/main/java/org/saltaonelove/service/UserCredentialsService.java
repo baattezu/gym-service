@@ -1,15 +1,15 @@
 package org.saltaonelove.service;
 
-import org.saltaonelove.dto.AuthRequest;
+import org.saltaonelove.dto.auth.AuthRequest;
+import org.saltaonelove.dto.auth.ChangeLoginRequest;
 import org.saltaonelove.model.User;
 import org.saltaonelove.repos.UserRepository;
+import org.saltaonelove.util.logging.annotation.TransactionalWithLogging;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -66,4 +66,25 @@ public class UserCredentialsService {
         throw new IllegalArgumentException("Invalid credentials");
     }
 
+    public User login(AuthRequest auth) {
+        return authorize(auth, () -> userRepository.findByUsername(auth.username()).get());
+    }
+
+    @TransactionalWithLogging
+    public User changeLogin(String username, ChangeLoginRequest changeLoginRequest) {
+        log.info("Change password attempt: {}", changeLoginRequest.username());
+        if (!username.equals(changeLoginRequest.username())) {
+            throw new IllegalArgumentException("Invalid username");
+        }
+        User user = userRepository.findByUsername(changeLoginRequest.username()).get();
+        if (!changeLoginRequest.oldPassword().equals(user.getPassword())) {
+            throw new IllegalArgumentException("Old password is not correct");
+        }
+
+        user.setPassword(changeLoginRequest.newPassword());
+        userRepository.save(user);
+        log.info("Changed password for user: {}", changeLoginRequest.username());
+
+        return user;
+    }
 }
