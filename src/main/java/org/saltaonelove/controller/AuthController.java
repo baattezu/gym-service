@@ -24,10 +24,7 @@ public class AuthController {
     }
 
     @GetMapping
-    @Operation(summary = "Login user", requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
-            required = true,
-            content = @Content(schema = @Schema(implementation = AuthRequest.class))
-    ))
+    @Operation(summary = "Login user")
     public ResponseEntity<Void> login(
             @RequestBody @Valid AuthRequest auth) {
         userCredentialsService.login(auth);

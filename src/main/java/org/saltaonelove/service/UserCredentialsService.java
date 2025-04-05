@@ -2,6 +2,7 @@ package org.saltaonelove.service;
 
 import org.saltaonelove.dto.auth.AuthRequest;
 import org.saltaonelove.dto.auth.ChangeLoginRequest;
+import org.saltaonelove.exception.exceptions.AuthException;
 import org.saltaonelove.model.User;
 import org.saltaonelove.repos.UserRepository;
 import org.saltaonelove.util.logging.annotation.TransactionalWithLogging;
@@ -63,7 +64,7 @@ public class UserCredentialsService {
             return user;
         }
         log.warn("Login attempt failed for user: {}", auth.username());
-        throw new IllegalArgumentException("Invalid credentials");
+        throw new AuthException("Invalid credentials");
     }
 
     public User login(AuthRequest auth) {
