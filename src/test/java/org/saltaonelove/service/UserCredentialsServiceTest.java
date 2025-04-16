@@ -9,6 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.saltaonelove.InitModels;
 import org.saltaonelove.dto.auth.AuthRequest;
 import org.saltaonelove.dto.auth.ChangeLoginRequest;
+import org.saltaonelove.exception.exceptions.AuthException;
 import org.saltaonelove.model.Trainee;
 import org.saltaonelove.model.Trainer;
 import org.saltaonelove.model.User;
@@ -89,7 +90,7 @@ class UserCredentialsServiceTest {
         AuthRequest authRequest = new AuthRequest(trainee.getUsername(), "WrongPassword");
         Supplier<Trainee> identityProvider = () -> trainee;
 
-        assertThrows(IllegalArgumentException.class, () -> trainee = userCredentialsService.authorize(authRequest, identityProvider));
+        assertThrows(AuthException.class, () -> trainee = userCredentialsService.authorize(authRequest, identityProvider));
     }
 
     @Test

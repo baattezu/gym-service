@@ -8,9 +8,10 @@ import org.saltaonelove.dto.training.TrainingResponse;
 import org.saltaonelove.model.Trainer;
 import org.saltaonelove.repos.TrainerRepository;
 import org.saltaonelove.repos.TrainingTypeRepository;
-import org.saltaonelove.util.DtoMapper;
 import org.saltaonelove.util.logging.LoggingUtil;
 import org.saltaonelove.util.logging.annotation.TransactionalWithLogging;
+import org.saltaonelove.util.mapper.TrainerDtoMapper;
+import org.saltaonelove.util.mapper.TrainingDtoMapper;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -69,7 +70,7 @@ public class TrainerService {
     public TrainerResponse showProfile(String username) {
         log.info("Showing profile for user: {}", username);
         Trainer t = trainerRepository.findByUsername(username).get();
-        return DtoMapper.toTrainerResponse(t);
+        return TrainerDtoMapper.toTrainerResponse(t);
     }
 
     @TransactionalWithLogging
@@ -84,7 +85,7 @@ public class TrainerService {
 
         t = trainerRepository.save(t);
         log.info("Updated trainer {}'s profile successfully!", t.getUsername());
-        return DtoMapper.toTrainerResponse(t);
+        return TrainerDtoMapper.toTrainerResponse(t);
     }
 
     @TransactionalWithLogging
@@ -107,7 +108,7 @@ public class TrainerService {
         log.info("Fetching trainings for trainer {}", username);
         return trainerRepository.findTrainerTrainingsByUsernameAndCriteria(
                 username, fromDate, toDate, traineeName, trainingType)
-                .stream().map(DtoMapper::toTrainingResponse).toList();
+                .stream().map(TrainingDtoMapper::toTrainingResponse).toList();
     }
 
 }

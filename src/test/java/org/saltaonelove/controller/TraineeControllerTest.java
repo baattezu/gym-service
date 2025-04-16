@@ -14,7 +14,9 @@ import org.saltaonelove.dto.trainer.TrainerResponse;
 import org.saltaonelove.dto.training.TrainingResponse;
 import org.saltaonelove.model.Trainee;
 import org.saltaonelove.service.TraineeService;
-import org.saltaonelove.util.DtoMapper;
+import org.saltaonelove.util.mapper.TraineeDtoMapper;
+import org.saltaonelove.util.mapper.TrainerDtoMapper;
+import org.saltaonelove.util.mapper.TrainingDtoMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -68,7 +70,7 @@ class TraineeControllerTest {
 
     @Test
     void testGetTraineeByUsername() throws Exception {
-        TraineeResponse response = DtoMapper.toTraineeResponse(InitModels.initTrainee());
+        TraineeResponse response = TraineeDtoMapper.toTraineeResponse(InitModels.initTrainee());
 
         when(traineeService.showProfile("trainee1")).thenReturn(response);
 
@@ -81,7 +83,7 @@ class TraineeControllerTest {
 
     @Test
     void testGetTrainersAvailable() throws Exception {
-        List<TrainerResponse> trainers = List.of(DtoMapper.toTrainerResponse(InitModels.initTrainer()));
+        List<TrainerResponse> trainers = List.of(TrainerDtoMapper.toTrainerResponse(InitModels.initTrainer()));
 
         when(traineeService.getTrainersAvailableForTrainee("trainee1")).thenReturn(trainers);
 
@@ -93,7 +95,7 @@ class TraineeControllerTest {
 
     @Test
     void testGetTrainings() throws Exception {
-        List<TrainingResponse> trainings = List.of(DtoMapper.toTrainingResponse(InitModels.initTraining()));
+        List<TrainingResponse> trainings = List.of(TrainingDtoMapper.toTrainingResponse(InitModels.initTraining()));
 
         when(traineeService.getTraineeTrainings("trainee1", null, null, null, null)).thenReturn(trainings);
 
@@ -108,7 +110,7 @@ class TraineeControllerTest {
         TraineeUpdateRequest request = new TraineeUpdateRequest(authRequest,
                 "John.Doe", "John", "Doe",
                 LocalDate.ofYearDay(2001,1), "address1", true);
-        TraineeResponse response = DtoMapper.toTraineeResponse(InitModels.initTrainee());
+        TraineeResponse response = TraineeDtoMapper.toTraineeResponse(InitModels.initTrainee());
 
         when(traineeService.updateTrainee(request)).thenReturn(response);
 
@@ -123,7 +125,7 @@ class TraineeControllerTest {
     void testUpdateTraineeTrainers() throws Exception {
         AuthRequest auth = new AuthRequest("trainee1", "pass");
         TraineeUpdateTrainersRequest request = new TraineeUpdateTrainersRequest(auth, java.util.List.of("trainer1"));
-        List<TrainerResponse> trainers = List.of(DtoMapper.toTrainerResponse(InitModels.initTrainer()));
+        List<TrainerResponse> trainers = List.of(TrainerDtoMapper.toTrainerResponse(InitModels.initTrainer()));
 
         when(traineeService.updateTrainerList("trainee1", request.trainersList())).thenReturn(trainers);
 

@@ -10,14 +10,15 @@ import org.saltaonelove.model.Trainee;
 import org.saltaonelove.model.Trainer;
 import org.saltaonelove.repos.TraineeRepository;
 import org.saltaonelove.repos.TrainerRepository;
-import org.saltaonelove.util.DtoMapper;
 import org.saltaonelove.util.UpdateUtil;
 import org.saltaonelove.util.logging.LoggingUtil;
 import org.saltaonelove.util.logging.annotation.TransactionalWithLogging;
+import org.saltaonelove.util.mapper.TraineeDtoMapper;
+import org.saltaonelove.util.mapper.TrainerDtoMapper;
+import org.saltaonelove.util.mapper.TrainingDtoMapper;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
@@ -72,7 +73,7 @@ public class TraineeService {
     public TraineeResponse showProfile(String username) {
         log.info("Showing profile for user: {}", username);
         Trainee t = traineeRepository.findByUsername(username).get();
-        return DtoMapper.toTraineeResponse(t);
+        return TraineeDtoMapper.toTraineeResponse(t);
     }
 
     @TransactionalWithLogging
@@ -90,19 +91,19 @@ public class TraineeService {
         t = traineeRepository.save(t);
         log.info("Updated trainee {}'s profile successfully!", t.getUsername());
 
-        return DtoMapper.toTraineeResponse(t);
+        return TraineeDtoMapper.toTraineeResponse(t);
     }
 
     public List<TrainingResponse> getTraineeTrainings(String username, LocalDate fromDate, LocalDate toDate, String trainerName, String trainingType) {
         return traineeRepository.findTraineeTrainingsByUsernameAndCriteria(
                 username, fromDate, toDate, trainerName, trainingType
-        ).stream().map(DtoMapper::toTrainingResponse).toList();
+        ).stream().map(TrainingDtoMapper::toTrainingResponse).toList();
     }
 
     public List<TrainerResponse> getTrainersAvailableForTrainee(String traineeName){
         log.info("Fetching available trainers for trainee {}", traineeName);
         List<Trainer> trainers = trainerRepository.findTrainersThatAreNotAssignedToTrainee(traineeName);
-        return trainers.stream().map(DtoMapper::toTrainerResponseInList).toList();
+        return trainers.stream().map(TrainerDtoMapper::toTrainerResponseInList).toList();
     }
 
     @TransactionalWithLogging
@@ -134,7 +135,7 @@ public class TraineeService {
 
         trainee = traineeRepository.save(trainee);
         log.info("Updated trainee {}'s trainer list successfully!", username);
-        return trainers.stream().map(DtoMapper::toTrainerResponseInList).toList();
+        return trainers.stream().map(TrainerDtoMapper::toTrainerResponseInList).toList();
     }
 
     @TransactionalWithLogging

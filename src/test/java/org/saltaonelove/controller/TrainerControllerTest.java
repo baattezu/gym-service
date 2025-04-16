@@ -4,7 +4,6 @@ package org.saltaonelove.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.saltaonelove.InitModels;
 import org.saltaonelove.dto.auth.AuthRequest;
 import org.saltaonelove.dto.trainer.TrainerRequest;
@@ -13,7 +12,8 @@ import org.saltaonelove.dto.trainer.TrainerUpdateRequest;
 import org.saltaonelove.dto.training.TrainingResponse;
 import org.saltaonelove.model.Trainer;
 import org.saltaonelove.service.TrainerService;
-import org.saltaonelove.util.DtoMapper;
+import org.saltaonelove.util.mapper.TrainerDtoMapper;
+import org.saltaonelove.util.mapper.TrainingDtoMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -63,7 +63,7 @@ class TrainerControllerTest {
 
     @Test
     void testGetTrainerByUsername() throws Exception {
-        TrainerResponse response = DtoMapper.toTrainerResponse(InitModels.initTrainer());
+        TrainerResponse response = TrainerDtoMapper.toTrainerResponse(InitModels.initTrainer());
 
         when(trainerService.showProfile("trainer1")).thenReturn(response);
 
@@ -76,7 +76,7 @@ class TrainerControllerTest {
 
     @Test
     void testGetTrainerTrainings() throws Exception {
-        List<TrainingResponse> trainings = List.of(DtoMapper.toTrainingResponse(InitModels.initTraining()));
+        List<TrainingResponse> trainings = List.of(TrainingDtoMapper.toTrainingResponse(InitModels.initTraining()));
 
         when(trainerService.getTrainerTrainings("trainer1", null, null, null, null)).thenReturn(trainings);
 
@@ -89,7 +89,7 @@ class TrainerControllerTest {
     @Test
     void testUpdateTrainer() throws Exception {
         TrainerUpdateRequest request = new TrainerUpdateRequest(authRequest, "Jane.Doe", "Jannice", "Doe", "Specialist", true);
-        TrainerResponse response = DtoMapper.toTrainerResponse(InitModels.initTrainer());
+        TrainerResponse response = TrainerDtoMapper.toTrainerResponse(InitModels.initTrainer());
 
         when(trainerService.updateTrainer(request)).thenReturn(response);
 
