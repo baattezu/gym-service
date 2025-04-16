@@ -1,4 +1,4 @@
-package org.saltaonelove.dto;
+package org.saltaonelove.dto.training;
 
 import java.time.LocalDate;
 

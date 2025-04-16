@@ -2,11 +2,15 @@ package org.saltaonelove.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDate;
 
 @Entity
 @Table(name = "training")
+@Getter
+@Setter
 public class Training {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -49,59 +53,4 @@ public class Training {
                 trainingId, trainer.getUsername(), trainee.getUsername(), trainingName, trainingType.getName(), date, duration);
     }
 
-    public Long getTrainingId() {
-        return trainingId;
-    }
-
-    public void setTrainingId(Long trainingId) {
-        this.trainingId = trainingId;
-    }
-
-    public Trainee getTrainee() {
-        return trainee;
-    }
-
-    public void setTrainee(Trainee trainee) {
-        this.trainee = trainee;
-    }
-
-    public Trainer getTrainer() {
-        return trainer;
-    }
-
-    public void setTrainer(Trainer trainer) {
-        this.trainer = trainer;
-    }
-
-    public String getTrainingName() {
-        return trainingName;
-    }
-
-    public void setTrainingName(String trainingName) {
-        this.trainingName = trainingName;
-    }
-
-    public TrainingType getTrainingType() {
-        return trainingType;
-    }
-
-    public void setTrainingType(TrainingType trainingType) {
-        this.trainingType = trainingType;
-    }
-
-    public LocalDate getDate() {
-        return date;
-    }
-
-    public void setDate(LocalDate date) {
-        this.date = date;
-    }
-
-    public Long getDuration() {
-        return duration;
-    }
-
-    public void setDuration(Long duration) {
-        this.duration = duration;
-    }
 }

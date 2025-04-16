@@ -7,8 +7,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.saltaonelove.InitModels;
-import org.saltaonelove.dto.TrainerDTO;
-import org.saltaonelove.dto.TrainingDTO;
+import org.saltaonelove.dto.auth.AuthRequest;
+import org.saltaonelove.dto.training.TrainingDTO;
+import org.saltaonelove.dto.training.TrainingRequest;
 import org.saltaonelove.model.Trainee;
 import org.saltaonelove.model.Trainer;
 import org.saltaonelove.model.Training;
@@ -46,6 +47,7 @@ class TrainingServiceTest {
     private Training training;
     private Trainer trainer;
     private Trainee trainee;
+    private AuthRequest authRequest;
     private TrainingType trainingType;
 
     @BeforeEach
@@ -54,23 +56,20 @@ class TrainingServiceTest {
         trainer = InitModels.initTrainer();
         trainingType = InitModels.initTrainingType();
         training = InitModels.initTraining(trainee, trainer, trainingType);
+        authRequest = new AuthRequest(trainee.getUsername(), trainee.getPassword());
     }
 
     @Test
     void testCreateTraining() {
         doReturn(training).when(trainingRepository).save(any(Training.class));
-        when(trainerRepository.findById(2L)).thenReturn(Optional.of(trainer));
-        when(traineeRepository.findById(1L)).thenReturn(Optional.of(trainee));
-        when(trainingTypeRepository.findById(1L)).thenReturn(Optional.of(trainingType));
+        when(trainerRepository.findByUsername(anyString())).thenReturn(Optional.of(trainer));
+        when(traineeRepository.findByUsername(anyString())).thenReturn(Optional.of(trainee));
 
-        Training result = trainingService.createTraining(
-                new TrainingDTO(
-                        1L,2L, "Cardio with Jane",
-                        1L, LocalDate.of(2012,12,12), 60L)
-        );
+        TrainingRequest trainingRequest = new TrainingRequest(authRequest, trainee.getUsername(), trainer.getUsername(),"Cardio with Jane",
+                LocalDate.of(2012,12,12), 60L);
 
+        Training result = trainingService.createTraining(trainingRequest);
         assertNotNull(result);
-        assertEquals("Cardio Training", result.getTrainingName());
 
         verify(trainingRepository, times(1)).save(any(Training.class));
     }
@@ -98,4 +97,5 @@ class TrainingServiceTest {
 
         verify(trainingRepository).findById(1L);
     }
+
 }

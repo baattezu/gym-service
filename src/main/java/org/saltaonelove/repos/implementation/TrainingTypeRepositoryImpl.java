@@ -25,7 +25,7 @@ public class TrainingTypeRepositoryImpl implements TrainingTypeRepository {
     @Override
     public Optional<TrainingType> findByName(String name) {
         return Optional.ofNullable(
-                entityManager.createNamedQuery("findByName", TrainingType.class)
+                entityManager.createNamedQuery("TrainingType.findByName", TrainingType.class)
                 .setParameter("ttName", name).getSingleResult());
     }
 

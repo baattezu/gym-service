@@ -1,8 +1,11 @@
 package org.saltaonelove.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.Immutable;
 
 import java.util.List;
@@ -11,9 +14,11 @@ import java.util.List;
 @Table(name = "training_types")
 @Immutable
 @NamedQuery(
-        name="findByName",
+        name="TrainingType.findByName",
         query="SELECT tt FROM TrainingType tt WHERE tt.name LIKE :ttName"
 )
+@Getter
+@Setter
 public class TrainingType {
 
     @Id
@@ -24,6 +29,7 @@ public class TrainingType {
     @NotNull
     private String name;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "trainingType")
     List<Training> trainingList;
 
@@ -40,19 +46,4 @@ public class TrainingType {
                 trainingTypeId, name );
     }
 
-    public Long getTrainingTypeId() {
-        return trainingTypeId;
-    }
-
-    public void setTrainingTypeId(Long trainingTypeId) {
-        this.trainingTypeId = trainingTypeId;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
 }

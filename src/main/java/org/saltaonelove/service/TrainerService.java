@@ -1,17 +1,18 @@
 package org.saltaonelove.service;
 
-import org.saltaonelove.dto.AuthRequest;
-import org.saltaonelove.dto.TrainerDTO;
+import org.saltaonelove.dto.auth.AuthRequest;
+import org.saltaonelove.dto.trainer.TrainerRequest;
+import org.saltaonelove.dto.trainer.TrainerResponse;
+import org.saltaonelove.dto.trainer.TrainerUpdateRequest;
+import org.saltaonelove.dto.training.TrainingResponse;
 import org.saltaonelove.model.Trainer;
-import org.saltaonelove.model.Training;
 import org.saltaonelove.repos.TrainerRepository;
 import org.saltaonelove.repos.TrainingTypeRepository;
-import org.saltaonelove.util.UpdateUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.saltaonelove.util.logging.LoggingUtil;
+import org.saltaonelove.util.logging.annotation.TransactionalWithLogging;
+import org.saltaonelove.util.mapper.TrainerDtoMapper;
+import org.saltaonelove.util.mapper.TrainingDtoMapper;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -19,7 +20,7 @@ import java.util.List;
 @Service
 public class TrainerService {
 
-    private static final Logger log = LoggerFactory.getLogger(TrainerService.class);
+    private static final LoggingUtil log = LoggingUtil.getLogger(TrainerService.class);
 
     private TrainerRepository trainerRepository;
     private TrainingTypeRepository trainingTypeRepository;
@@ -31,12 +32,12 @@ public class TrainerService {
         this.userUtil = userUtil;
     }
 
-    @Transactional
-    public Trainer registerTrainer(TrainerDTO trainerDTO) {
-        log.info("Registering trainer: {} {}", trainerDTO.firstName(), trainerDTO.lastName());
+    @TransactionalWithLogging
+    public Trainer registerTrainer(TrainerRequest trainerRequest) {
+        log.info("Registering trainer: {} {}", trainerRequest.firstName(), trainerRequest.lastName());
         Trainer trainer = new Trainer(
-                trainerDTO.firstName(), trainerDTO.lastName(),
-                trainingTypeRepository.findByName(trainerDTO.specialization()).orElseThrow(
+                trainerRequest.firstName(), trainerRequest.lastName(),
+                trainingTypeRepository.findByName(trainerRequest.specialization()).orElseThrow(
                         () -> new IllegalArgumentException("Specialization not found")
                 )
         );
@@ -52,10 +53,9 @@ public class TrainerService {
                 () -> trainerRepository.findByUsername(auth.username()).get());
     }
 
-    @Transactional
-    public Trainer toggleActivationOfAccount(AuthRequest auth) {
-        loginForTrainer(auth);
-        Trainer trainer = trainerRepository.findByUsername(auth.username()).get();
+    @TransactionalWithLogging
+    public Trainer toggleActivationOfAccount(String username) {
+        Trainer trainer = trainerRepository.findByUsername(username).get();
         trainer.setActive(!trainer.isActive());
         trainer = trainerRepository.save(trainer);
         log.info("Trainer {} is {}", trainer.getUsername(), trainer.isActive() ? "activated" : "deactivated");
@@ -63,35 +63,32 @@ public class TrainerService {
     }
 
 
-    public List<Trainer> listTrainers(AuthRequest auth) {
-        loginForTrainer(auth);
+    public List<Trainer> listTrainers(String username) {
         return trainerRepository.findAll();
     }
 
-    public Trainer showProfile(AuthRequest auth) {
-        loginForTrainer(auth);
-        log.info("Showing profile for user: {}", auth.username());
-        return trainerRepository.findByUsername(auth.username()).get();
+    public TrainerResponse showProfile(String username) {
+        log.info("Showing profile for user: {}", username);
+        Trainer t = trainerRepository.findByUsername(username).get();
+        return TrainerDtoMapper.toTrainerResponse(t);
     }
 
-    @Transactional
-    public Trainer updateTrainer(AuthRequest auth, TrainerDTO trainerDto) {
-        loginForTrainer(auth);
-        log.info("Updating trainer: {} {}", trainerDto.firstName(), trainerDto.lastName());
-        Trainer trainer = trainerRepository.findByUsername(auth.username()).get();
+    @TransactionalWithLogging
+    public TrainerResponse updateTrainer(TrainerUpdateRequest trainerRequest) {
+        log.info("Updating trainer: {} {}", trainerRequest.firstName(), trainerRequest.lastName());
+        Trainer t = trainerRepository.findByUsername(trainerRequest.username()).get();
 
-        UpdateUtil.setIfNotNull(trainerDto.firstName(), trainer::setFirstName);
-        UpdateUtil.setIfNotNull(trainerDto.lastName(), trainer::setLastName);
-        UpdateUtil.setIfNotNull(trainingTypeRepository.findByName(trainerDto.specialization())
-                        .orElseThrow(() -> new IllegalArgumentException("Specialization not found"))
-                , trainer::setSpecialization);
+        t.setFirstName(trainerRequest.firstName());
+        t.setLastName(trainerRequest.lastName());
+        t.setSpecialization(trainingTypeRepository.findByName(trainerRequest.specialization()).orElseThrow(() -> new IllegalArgumentException("Specialization not found")));
+        t.setActive(trainerRequest.isActive());
 
-        trainer = trainerRepository.save(trainer);
-        log.info("Updated trainer {}'s profile successfully!", auth.username());
-        return trainer;
+        t = trainerRepository.save(t);
+        log.info("Updated trainer {}'s profile successfully!", t.getUsername());
+        return TrainerDtoMapper.toTrainerResponse(t);
     }
 
-    @Transactional
+    @TransactionalWithLogging
     public Trainer changePassword(AuthRequest auth, String newPassword) {
         loginForTrainer(auth);
         log.info("User {} is attempting to change their password", auth.username());
@@ -107,16 +104,11 @@ public class TrainerService {
     }
 
 
-    public List<Training> getTrainerTrainings(AuthRequest authRequest, LocalDate fromDate, LocalDate toDate, String traineeName, String trainingType) {
-        loginForTrainer(authRequest);
-        log.info("Fetching trainings for trainer {}", authRequest.username());
-        return trainerRepository.findTrainerTrainingsByUsernameAndCriteria(authRequest.username(), fromDate, toDate, traineeName, trainingType);
-    }
-
-    public List<Trainer> getTrainersAvailableForTrainee(AuthRequest authRequest, String traineeName){
-        loginForTrainer(authRequest);
-        log.info("Fetching available trainers for trainee {}", traineeName);
-        return trainerRepository.findTrainersThatAreNotAssignedToTrainee(traineeName);
+    public List<TrainingResponse> getTrainerTrainings(String username, LocalDate fromDate, LocalDate toDate, String traineeName, String trainingType) {
+        log.info("Fetching trainings for trainer {}", username);
+        return trainerRepository.findTrainerTrainingsByUsernameAndCriteria(
+                username, fromDate, toDate, traineeName, trainingType)
+                .stream().map(TrainingDtoMapper::toTrainingResponse).toList();
     }
 
 }

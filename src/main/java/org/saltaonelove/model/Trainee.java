@@ -1,6 +1,8 @@
 package org.saltaonelove.model;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -11,9 +13,11 @@ import java.util.List;
 @Table(name = "trainee")
 @PrimaryKeyJoinColumn(name = "trainee_id", referencedColumnName = "user_id")
 @NamedQuery(
-        name="findTrainee_ByUsername",
+        name="Trainee.findByUsername",
         query="SELECT te FROM Trainee te WHERE te.username LIKE :username"
 )
+@Getter
+@Setter
 public class Trainee extends User {
 
     @Column(name = "date_of_birth")
@@ -54,39 +58,11 @@ public class Trainee extends User {
         );
     }
 
-    public LocalDate getDateOfBirth() {
-        return dateOfBirth;
-    }
-
-    public void setDateOfBirth(LocalDate dateOfBirth) {
-        this.dateOfBirth = dateOfBirth;
-    }
-
     public void setDateOfBirth(String dateOfBirth) {
         this.dateOfBirth = LocalDate.parse(dateOfBirth, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
     }
 
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public List<Trainer> getTrainers() {
-        return trainers;
-    }
-
-    public void setTrainers(List<Trainer> trainers) {
-        this.trainers = trainers;
-    }
-
-    public List<Training> getTrainings() {
-        return trainings;
-    }
-
-    public void setTrainings(List<Training> trainings) {
-        this.trainings = trainings;
+    public void setDateOfBirth(LocalDate dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
     }
 }

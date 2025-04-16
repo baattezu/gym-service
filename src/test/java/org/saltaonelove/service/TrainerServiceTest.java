@@ -7,8 +7,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.saltaonelove.InitModels;
-import org.saltaonelove.dto.AuthRequest;
-import org.saltaonelove.dto.TrainerDTO;
+import org.saltaonelove.dto.auth.AuthRequest;
+import org.saltaonelove.dto.trainer.TrainerRequest;
+import org.saltaonelove.dto.trainer.TrainerResponse;
+import org.saltaonelove.dto.trainer.TrainerUpdateRequest;
 import org.saltaonelove.model.Trainer;
 import org.saltaonelove.repos.TrainerRepository;
 import org.saltaonelove.repos.TrainingTypeRepository;
@@ -44,13 +46,13 @@ class TrainerServiceTest {
 
     @Test
     void testRegisterTrainer() {
-        TrainerDTO trainerDTO = new TrainerDTO("Jane", "Doe", "Cardio");
+        TrainerRequest trainerRequest = new TrainerRequest("Jane", "Doe", "Cardio");
 
-        when(trainingTypeRepository.findByName(trainerDTO.specialization())).thenReturn(Optional.of(InitModels.initTrainingType()));
+        when(trainingTypeRepository.findByName(trainerRequest.specialization())).thenReturn(Optional.of(InitModels.initTrainingType()));
         when(userUtil.generateUsername(any(Trainer.class))).thenReturn("Jane.Doe");
         when(trainerRepository.save(any(Trainer.class))).thenReturn(trainer);
 
-        Trainer result = trainerService.registerTrainer(trainerDTO);
+        Trainer result = trainerService.registerTrainer(trainerRequest);
 
         assertNotNull(result);
         assertEquals("Jane", result.getFirstName());
@@ -67,7 +69,7 @@ class TrainerServiceTest {
         when(trainerRepository.findByUsername(trainerAuth.username())).thenReturn(Optional.of(trainer));
         when(trainerRepository.save(any(Trainer.class))).thenReturn(trainer);
 
-        Trainer newTrainer = trainerService.toggleActivationOfAccount(trainerAuth);
+        Trainer newTrainer = trainerService.toggleActivationOfAccount(trainerAuth.username());
 
         assertNotNull(newTrainer);
 
@@ -79,18 +81,18 @@ class TrainerServiceTest {
 
     @Test
     void testUpdateTrainer() {
-        TrainerDTO updTrainerDTO = new TrainerDTO("Jane", "Down", "Cardio");
+        TrainerUpdateRequest updTrainerRequest = new TrainerUpdateRequest(trainerAuth,"Jane.Doe","Jane", "Down", "Cardio", true);
 
-        when(trainingTypeRepository.findByName(updTrainerDTO.specialization())).thenReturn(Optional.of(InitModels.initTrainingType()));
+        when(trainingTypeRepository.findByName(updTrainerRequest.specialization())).thenReturn(Optional.of(InitModels.initTrainingType()));
         when(trainerRepository.findByUsername(trainerAuth.username())).thenReturn(Optional.of(trainer));
         when(trainerRepository.save(any(Trainer.class))).thenReturn(trainer);
 
-        Trainer result = trainerService.updateTrainer(trainerAuth, updTrainerDTO);
+        TrainerResponse result = trainerService.updateTrainer(updTrainerRequest);
 
         assertNotNull(result);
-        assertEquals("Jane", result.getFirstName());
-        assertEquals("Down", result.getLastName());
-        assertEquals("Cardio", result.getSpecialization().getName());
+        assertEquals("Jane", result.firstName());
+        assertEquals("Down", result.lastName());
+        assertEquals("Cardio", result.specialization().getName());
 
         verify(trainerRepository).findByUsername(trainerAuth.username());
         verify(trainerRepository).save(any(Trainer.class));
@@ -139,7 +141,7 @@ class TrainerServiceTest {
     void testListTrainers() {
         when(trainerRepository.findAll()).thenReturn(List.of(trainer));
 
-        List<Trainer> result = trainerService.listTrainers(trainerAuth);
+        List<Trainer> result = trainerService.listTrainers(trainerAuth.username());
 
         assertFalse(result.isEmpty());
         assertEquals(1, result.size());
@@ -151,10 +153,9 @@ class TrainerServiceTest {
     void testShowTrainerProfile() {
         when(trainerRepository.findByUsername(trainerAuth.username())).thenReturn(Optional.of(trainer));
 
-        Trainer result = trainerService.showProfile(trainerAuth);
+        TrainerResponse result = trainerService.showProfile(trainerAuth.username());
 
         assertNotNull(result);
-        assertEquals(2L, result.getUserId());
 
         verify(trainerRepository).findByUsername(trainerAuth.username());
     }
