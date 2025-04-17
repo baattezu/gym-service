@@ -1,5 +1,6 @@
 package org.saltaonelove.controller;
 
+import io.micrometer.core.annotation.Timed;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import org.saltaonelove.dto.auth.AuthRequest;
@@ -63,6 +64,7 @@ public class TraineeController {
 
     @GetMapping("/{username}/trainings")
     @Operation(summary = "Get trainee's trainings")
+    @Timed(value="api_endpoint_getTraineeTrainings_time",description="Time to Get All trainee trainings")
     public ResponseEntity<List<TrainingResponse>> getTraineeTrainings(
             @PathVariable String username,
             @RequestParam(required = false) LocalDate fromDate,

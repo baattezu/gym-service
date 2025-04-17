@@ -3,6 +3,7 @@ package org.saltaonelove.service;
 import org.saltaonelove.dto.auth.AuthRequest;
 import org.saltaonelove.dto.auth.ChangeLoginRequest;
 import org.saltaonelove.exception.exceptions.AuthException;
+import org.saltaonelove.metrics.AuthMetrics;
 import org.saltaonelove.model.User;
 import org.saltaonelove.repos.UserRepository;
 import org.saltaonelove.util.logging.annotation.TransactionalWithLogging;
@@ -20,9 +21,11 @@ public class UserCredentialsService {
     private static final Logger log = LoggerFactory.getLogger(UserCredentialsService.class);
 
     private UserRepository userRepository;
+    private AuthMetrics authMetrics;
 
-    public UserCredentialsService(UserRepository userRepository) {
+    public UserCredentialsService(UserRepository userRepository, AuthMetrics authMetrics) {
         this.userRepository = userRepository;
+        this.authMetrics = authMetrics;
     }
 
     private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -61,6 +64,7 @@ public class UserCredentialsService {
         E user = identityProvider.get();
         if (auth.password().equals(user.getPassword()) && auth.username().equals(user.getUsername())) {
             log.info("Logged in user: {}", auth.username());
+            authMetrics.onSuccessfulLogin(user.getUserId());
             return user;
         }
         log.warn("Login attempt failed for user: {}", auth.username());
