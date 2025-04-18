@@ -1,5 +1,6 @@
 package org.saltaonelove.controller;
 
+import io.micrometer.core.annotation.Timed;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import org.saltaonelove.dto.auth.AuthRequest;
@@ -29,6 +30,7 @@ public class TrainingController {
 
     @PostMapping
     @Operation(summary = "Create training")
+    @Timed(value="api_endpoint_createTraining_time",description="Time to Create training")
     public ResponseEntity<Void> createTraining(@RequestBody @Valid TrainingRequest trainingRequest){
         userCredentialsService.login(trainingRequest.authRequest());
         trainingService.createTraining(trainingRequest);
