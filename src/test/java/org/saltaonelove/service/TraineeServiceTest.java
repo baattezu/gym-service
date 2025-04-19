@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.saltaonelove.InitModels;
 import org.saltaonelove.dto.auth.AuthRequest;
+import org.saltaonelove.dto.auth.AuthResponse;
 import org.saltaonelove.dto.trainee.TraineeRegisterRequest;
 import org.saltaonelove.dto.trainee.TraineeResponse;
 import org.saltaonelove.dto.trainee.TraineeUpdateRequest;
@@ -15,6 +16,7 @@ import org.saltaonelove.dto.trainer.TrainerResponse;
 import org.saltaonelove.model.Trainee;
 import org.saltaonelove.repos.TraineeRepository;
 import org.saltaonelove.repos.TrainerRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -35,6 +37,9 @@ class TraineeServiceTest {
     @Mock
     private UserCredentialsService userUtil;
 
+    @Mock
+    private PasswordEncoder passwordEncoder;
+
     @InjectMocks
     private TraineeService traineeService;
 
@@ -51,31 +56,12 @@ class TraineeServiceTest {
     void testRegisterTrainee() {
         when(userUtil.generateUsername(any(Trainee.class))).thenReturn("John.Doe");
         when(traineeRepository.save(any(Trainee.class))).thenReturn(trainee);
+        when(passwordEncoder.encode(any())).thenReturn("somepasswordinhashwithsalt");
 
-        Trainee result = traineeService.registerTrainee(new TraineeRegisterRequest("John", "Doe"));
-
-        assertNotNull(result);
-        assertEquals("John", result.getFirstName());
-        assertEquals("Doe", result.getLastName());
-
-        verify(traineeRepository).save(any(Trainee.class));
-    }
-
-    @Test
-    void testRegisterTraineeWithDetails() {
-        when(userUtil.generateUsername(any(Trainee.class))).thenReturn("John.Doe");
-        when(traineeRepository.save(any(Trainee.class))).thenReturn(trainee);
-
-        Trainee result = traineeService.registerTrainee(
-                new TraineeRegisterRequest("John", "Doe",
-                        LocalDate.ofYearDay(2001,1), "address1")
-        );
+        AuthResponse result = traineeService.registerTrainee(new TraineeRegisterRequest("John", "Doe"));
 
         assertNotNull(result);
-        assertEquals("John", result.getFirstName());
-        assertEquals("Doe", result.getLastName());
-        assertEquals("address1", result.getAddress());
-        assertEquals(LocalDate.ofYearDay(2001,1), result.getDateOfBirth());
+        assertEquals("John.Doe", result.username());
 
         verify(traineeRepository).save(any(Trainee.class));
     }
@@ -123,8 +109,7 @@ class TraineeServiceTest {
 
     @Test
     void testUpdateTrainee() {
-        TraineeUpdateRequest request = new TraineeUpdateRequest(
-                traineeAuth, "John.Doe",
+        TraineeUpdateRequest request = new TraineeUpdateRequest( "John.Doe",
                 "John", "NewLastName",
                 LocalDate.ofYearDay(2001,1),
                 "New Address", true );

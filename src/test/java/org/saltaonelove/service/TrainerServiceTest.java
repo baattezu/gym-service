@@ -8,12 +8,14 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.saltaonelove.InitModels;
 import org.saltaonelove.dto.auth.AuthRequest;
+import org.saltaonelove.dto.auth.AuthResponse;
 import org.saltaonelove.dto.trainer.TrainerRequest;
 import org.saltaonelove.dto.trainer.TrainerResponse;
 import org.saltaonelove.dto.trainer.TrainerUpdateRequest;
 import org.saltaonelove.model.Trainer;
 import org.saltaonelove.repos.TrainerRepository;
 import org.saltaonelove.repos.TrainingTypeRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 import java.util.Optional;
@@ -26,8 +28,12 @@ class TrainerServiceTest {
 
     @Mock
     private TrainerRepository trainerRepository;
+
     @Mock
     private TrainingTypeRepository trainingTypeRepository;
+
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
     @Mock
     private UserCredentialsService userUtil;
@@ -51,13 +57,12 @@ class TrainerServiceTest {
         when(trainingTypeRepository.findByName(trainerRequest.specialization())).thenReturn(Optional.of(InitModels.initTrainingType()));
         when(userUtil.generateUsername(any(Trainer.class))).thenReturn("Jane.Doe");
         when(trainerRepository.save(any(Trainer.class))).thenReturn(trainer);
+        when(passwordEncoder.encode(any())).thenReturn("somepasswordinhashwithsalt");
 
-        Trainer result = trainerService.registerTrainer(trainerRequest);
+        AuthResponse result = trainerService.registerTrainer(trainerRequest);
 
         assertNotNull(result);
-        assertEquals("Jane", result.getFirstName());
-        assertEquals("Doe", result.getLastName());
-        assertEquals("Cardio", result.getSpecialization().getName());
+        assertEquals("Jane.Doe", result.username());
 
         verify(trainerRepository).save(any(Trainer.class));
     }
@@ -81,13 +86,13 @@ class TrainerServiceTest {
 
     @Test
     void testUpdateTrainer() {
-        TrainerUpdateRequest updTrainerRequest = new TrainerUpdateRequest(trainerAuth,"Jane.Doe","Jane", "Down", "Cardio", true);
+        TrainerUpdateRequest updTrainerRequest = new TrainerUpdateRequest("Jane.Doe","Jane", "Down", "Cardio", true);
 
         when(trainingTypeRepository.findByName(updTrainerRequest.specialization())).thenReturn(Optional.of(InitModels.initTrainingType()));
         when(trainerRepository.findByUsername(trainerAuth.username())).thenReturn(Optional.of(trainer));
         when(trainerRepository.save(any(Trainer.class))).thenReturn(trainer);
 
-        TrainerResponse result = trainerService.updateTrainer(updTrainerRequest);
+        TrainerResponse result = trainerService.updateTrainer("Jane.Doe", updTrainerRequest);
 
         assertNotNull(result);
         assertEquals("Jane", result.firstName());

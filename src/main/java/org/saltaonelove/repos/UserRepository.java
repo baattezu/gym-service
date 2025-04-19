@@ -12,5 +12,6 @@ public interface UserRepository {
     List<String> findUsernamesByBase(String username);
     Optional<User> findByUsername(String username);
     User save(User user);
+    String findUserPositionByUsername(String username);
 
 }

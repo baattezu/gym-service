@@ -2,6 +2,7 @@ package org.saltaonelove.controller;
 
 import io.micrometer.core.annotation.Timed;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.saltaonelove.dto.auth.AuthRequest;
 import org.saltaonelove.dto.training.TrainingRequest;
@@ -21,26 +22,22 @@ import java.util.List;
 public class TrainingController {
 
     private TrainingService trainingService;
-    private UserCredentialsService userCredentialsService;
 
-    public TrainingController(TrainingService trainingService, UserCredentialsService userCredentialsService) {
-        this.userCredentialsService = userCredentialsService;
+    public TrainingController(TrainingService trainingService) {
         this.trainingService = trainingService;
     }
 
     @PostMapping
-    @Operation(summary = "Create training")
+    @Operation(summary = "Create training",  security = @SecurityRequirement(name = "Bearer Authentication"))
     @Timed(value="api_endpoint_createTraining_time",description="Time to Create training")
     public ResponseEntity<Void> createTraining(@RequestBody @Valid TrainingRequest trainingRequest){
-        userCredentialsService.login(trainingRequest.authRequest());
         trainingService.createTraining(trainingRequest);
         return ResponseEntity.ok().build();
     }
 
     @GetMapping("/types")
-    @Operation(summary = "Get training types")
-    public ResponseEntity<List<TrainingType>> getTrainingTypes(@RequestBody @Valid AuthRequest authRequest){
-        userCredentialsService.login(authRequest);
+    @Operation(summary = "Get training types",  security = @SecurityRequirement(name = "Bearer Authentication"))
+    public ResponseEntity<List<TrainingType>> getTrainingTypes(){
         return ResponseEntity.ok().body(trainingService.getTrainingTypes());
     }
 

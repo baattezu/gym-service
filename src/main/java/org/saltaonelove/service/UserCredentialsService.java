@@ -1,31 +1,54 @@
 package org.saltaonelove.service;
 
 import org.saltaonelove.dto.auth.AuthRequest;
+import org.saltaonelove.dto.auth.AuthResponse;
 import org.saltaonelove.dto.auth.ChangeLoginRequest;
 import org.saltaonelove.exception.exceptions.AuthException;
 import org.saltaonelove.metrics.AuthMetrics;
+import org.saltaonelove.model.Trainer;
 import org.saltaonelove.model.User;
+import org.saltaonelove.repos.TraineeRepository;
+import org.saltaonelove.repos.TrainerRepository;
 import org.saltaonelove.repos.UserRepository;
+import org.saltaonelove.util.auth.LoginAttemptUtils;
 import org.saltaonelove.util.logging.annotation.TransactionalWithLogging;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
 
-@Service
-public class UserCredentialsService {
+@Service("userCredentialsService")
+public class UserCredentialsService{
 
     private static final Logger log = LoggerFactory.getLogger(UserCredentialsService.class);
 
     private UserRepository userRepository;
+    private AuthenticationManager authenticationManager;
+    private JwtService jwtService;
     private AuthMetrics authMetrics;
 
-    public UserCredentialsService(UserRepository userRepository, AuthMetrics authMetrics) {
+    public UserCredentialsService(
+            UserRepository userRepository, AuthenticationManager authenticationManager,
+            AuthMetrics authMetrics,
+            JwtService jwtService
+    ) {
         this.userRepository = userRepository;
+        this.authenticationManager = authenticationManager;
         this.authMetrics = authMetrics;
+        this.jwtService = jwtService;
     }
 
     private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -59,20 +82,27 @@ public class UserCredentialsService {
         return password.toString();
     }
 
-    public <E extends User> E authorize(AuthRequest auth, Supplier<E> identityProvider) {
+    public void authorize(AuthRequest auth) {
         log.info("User login attempt: {}", auth.username());
-        E user = identityProvider.get();
-        if (auth.password().equals(user.getPassword()) && auth.username().equals(user.getUsername())) {
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            auth.username(), auth.password()));
             log.info("Logged in user: {}", auth.username());
-            authMetrics.onSuccessfulLogin(user.getUserId());
-            return user;
+        } catch (BadCredentialsException ex){
+            log.warn("Login attempt failed for user: {}", auth.username());
+            throw new BadCredentialsException("Invalid credentials");
         }
-        log.warn("Login attempt failed for user: {}", auth.username());
-        throw new AuthException("Invalid credentials");
     }
 
-    public User login(AuthRequest auth) {
-        return authorize(auth, () -> userRepository.findByUsername(auth.username()).get());
+    public AuthResponse login(AuthRequest auth) {
+        authorize(auth);
+        User user = userRepository.findByUsername(auth.username()).get();
+
+        String token = jwtService.generateToken(user);
+        authMetrics.onSuccessfulLogin(user.getUserId());
+
+        return new AuthResponse(token);
     }
 
     @TransactionalWithLogging

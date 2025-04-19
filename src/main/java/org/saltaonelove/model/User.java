@@ -23,6 +23,23 @@ import java.util.Objects;
         @NamedQuery(
                 name = "User.findByUsername",
                 query = "SELECT user FROM User user WHERE user.username LIKE :username"
+        ),
+        @NamedQuery(
+                name = "User.findUserPositionByUsername",
+                query =
+                """
+                SELECT CASE
+                    WHEN EXISTS (
+                        SELECT 1 FROM Trainer t WHERE t.username = u.username
+                    ) THEN 'TRAINER'
+                    WHEN EXISTS (
+                        SELECT 1 FROM Trainee t WHERE t.username = u.username
+                    ) THEN 'TRAINEE'
+                    ELSE 'UNKNOWN'
+                END
+                FROM User u
+                WHERE u.username = :username
+                """
         )
 })
 @Getter

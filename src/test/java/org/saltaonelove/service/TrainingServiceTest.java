@@ -65,7 +65,7 @@ class TrainingServiceTest {
         when(trainerRepository.findByUsername(anyString())).thenReturn(Optional.of(trainer));
         when(traineeRepository.findByUsername(anyString())).thenReturn(Optional.of(trainee));
 
-        TrainingRequest trainingRequest = new TrainingRequest(authRequest, trainee.getUsername(), trainer.getUsername(),"Cardio with Jane",
+        TrainingRequest trainingRequest = new TrainingRequest(trainee.getUsername(), trainer.getUsername(),"Cardio with Jane",
                 LocalDate.of(2012,12,12), 60L);
 
         Training result = trainingService.createTraining(trainingRequest);
