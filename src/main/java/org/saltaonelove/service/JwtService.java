@@ -69,9 +69,8 @@ public class JwtService {
         return Jwts.builder().setClaims(extraClaims)
                 .setSubject(user.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + Integer.valueOf(30)))
+                .setExpiration(new Date(System.currentTimeMillis() + Integer.valueOf(expireTime)))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
-    //eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzdHJpbmcuc3RyaW5nMSIsImlhdCI6MTc0NTA3NTkwNSwiZXhwIjoxNzQ1MDc1OTA1fQ.SnYPeP4sfTX4h8NNrloJKdN3JtpYDPufN1ACIwdvb5M
 }
