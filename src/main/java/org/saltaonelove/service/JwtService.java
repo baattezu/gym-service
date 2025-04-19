@@ -29,13 +29,9 @@ public class JwtService {
     private ObjectMapper op = new ObjectMapper();
 
     public boolean isValid(String token) {
-        try {
-            Claims claims = extractAllClaims(token);
-            Date expiration = claims.getExpiration();
-            return expiration != null && expiration.after(new Date());
-        } catch (JwtException | IllegalArgumentException ex) {
-            throw new BadCredentialsException("Invalid JWT: " + ex.getMessage(), ex);
-        }
+        Claims claims = extractAllClaims(token);
+        Date expiration = claims.getExpiration();
+        return expiration != null && expiration.after(new Date());
     }
 
     public String extractUsername(String jwt) {
@@ -50,8 +46,12 @@ public class JwtService {
     }
 
     private Claims extractAllClaims(String jwt) {
-        JwtParser jwtParser = Jwts.parserBuilder().setSigningKey(getSignInKey()).build();
-        return jwtParser.parseClaimsJws(jwt).getBody();
+        try {
+            JwtParser jwtParser = Jwts.parserBuilder().setSigningKey(getSignInKey()).build();
+            return jwtParser.parseClaimsJws(jwt).getBody();
+        } catch (JwtException | IllegalArgumentException ex) {
+            throw new BadCredentialsException("Invalid JWT: " + ex.getMessage());
+        }
     }
 
     private Key getSignInKey() {
@@ -69,8 +69,9 @@ public class JwtService {
         return Jwts.builder().setClaims(extraClaims)
                 .setSubject(user.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + Integer.valueOf(expireTime)))
+                .setExpiration(new Date(System.currentTimeMillis() + Integer.valueOf(30)))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
+    //eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzdHJpbmcuc3RyaW5nMSIsImlhdCI6MTc0NTA3NTkwNSwiZXhwIjoxNzQ1MDc1OTA1fQ.SnYPeP4sfTX4h8NNrloJKdN3JtpYDPufN1ACIwdvb5M
 }
