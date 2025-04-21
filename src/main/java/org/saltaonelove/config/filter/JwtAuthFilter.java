@@ -54,9 +54,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                     );
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authToken);
-                    filterChain.doFilter(request, response);
                 }
             }
+            filterChain.doFilter(request, response);
         } catch (JwtException | IllegalArgumentException ex) {
             ErrorResponse errorResponse = new ErrorResponse(HttpStatus.UNAUTHORIZED.value() , ex.getMessage() );
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
