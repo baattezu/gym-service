@@ -40,18 +40,13 @@ public class JwtService {
 
     public List<SimpleGrantedAuthority> extractRoles(String jwt) {
         Claims claims = extractAllClaims(jwt);
-        List<String> roles = op.convertValue(claims.get("roles"), new TypeReference<List<String>>() {
-        });
+        List<String> roles = op.convertValue(claims.get("roles"), new TypeReference<List<String>>() {});
         return roles.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
     }
 
     private Claims extractAllClaims(String jwt) {
-        try {
-            JwtParser jwtParser = Jwts.parserBuilder().setSigningKey(getSignInKey()).build();
-            return jwtParser.parseClaimsJws(jwt).getBody();
-        } catch (JwtException | IllegalArgumentException ex) {
-            throw new BadCredentialsException("Invalid JWT: " + ex.getMessage());
-        }
+        JwtParser jwtParser = Jwts.parserBuilder().setSigningKey(getSignInKey()).build();
+        return jwtParser.parseClaimsJws(jwt).getBody();
     }
 
     private Key getSignInKey() {

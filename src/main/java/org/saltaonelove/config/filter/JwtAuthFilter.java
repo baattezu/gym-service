@@ -1,6 +1,7 @@
 package org.saltaonelove.config.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -38,33 +39,31 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
             String authHeader = request.getHeader("Authorization");
-            String token = null;
-            if (authHeader != null && authHeader.startsWith("Bearer ")) {
-                token = authHeader.substring(7);
-                String username = jwtService.extractUsername(token);
+            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+                filterChain.doFilter(request, response);
+                return;
+            }
+            String token = authHeader.substring(7);
+            String username = jwtService.extractUsername(token);
 
-                if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                    UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-
-                    if (jwtService.isValid(token)) {
-                        var authToken = new UsernamePasswordAuthenticationToken(
-                                userDetails, null, userDetails.getAuthorities()
-                        );
-                        authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                        SecurityContextHolder.getContext().setAuthentication(authToken);
-                    }
+            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                if (jwtService.isValid(token)) {
+                    var authToken = new UsernamePasswordAuthenticationToken(
+                            userDetails, null, userDetails.getAuthorities()
+                    );
+                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                    filterChain.doFilter(request, response);
                 }
             }
-            filterChain.doFilter(request, response);
-        } catch (BadCredentialsException ex) {
-
+        } catch (JwtException | IllegalArgumentException ex) {
             ErrorResponse errorResponse = new ErrorResponse(HttpStatus.UNAUTHORIZED.value() , ex.getMessage() );
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
             String jsonResponse = new ObjectMapper().writeValueAsString(errorResponse);
             response.getWriter().write(jsonResponse);
-
         }
 
     }
