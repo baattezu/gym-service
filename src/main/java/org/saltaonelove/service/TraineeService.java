@@ -1,6 +1,7 @@
 package org.saltaonelove.service;
 
 import org.saltaonelove.dto.auth.AuthRequest;
+import org.saltaonelove.dto.auth.AuthResponse;
 import org.saltaonelove.dto.trainee.TraineeRegisterRequest;
 import org.saltaonelove.dto.trainee.TraineeResponse;
 import org.saltaonelove.dto.trainee.TraineeUpdateRequest;
@@ -16,6 +17,7 @@ import org.saltaonelove.util.logging.annotation.TransactionalWithLogging;
 import org.saltaonelove.util.mapper.TraineeDtoMapper;
 import org.saltaonelove.util.mapper.TrainerDtoMapper;
 import org.saltaonelove.util.mapper.TrainingDtoMapper;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -29,31 +31,30 @@ public class TraineeService {
     private TraineeRepository traineeRepository;
     private TrainerRepository trainerRepository;
     private UserCredentialsService userUtil;
+    private PasswordEncoder passwordEncoder;
 
-    public TraineeService(TraineeRepository traineeRepository, TrainerRepository trainerRepository, UserCredentialsService userUtil) {
+    public TraineeService(TraineeRepository traineeRepository, TrainerRepository trainerRepository, UserCredentialsService userUtil, PasswordEncoder passwordEncoder) {
         this.traineeRepository = traineeRepository;
         this.trainerRepository = trainerRepository;
         this.userUtil = userUtil;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @TransactionalWithLogging
-    public Trainee registerTrainee(TraineeRegisterRequest traineeRegisterRequest) {
+    public AuthResponse registerTrainee(TraineeRegisterRequest traineeRegisterRequest) {
         log.info("Registering trainee: {} {}", traineeRegisterRequest.firstName(), traineeRegisterRequest.lastName());
         Trainee trainee = new Trainee(
                 traineeRegisterRequest.firstName(), traineeRegisterRequest.lastName(),
                 traineeRegisterRequest.dateOfBirth(),
                 traineeRegisterRequest.address()
         );
-        trainee.setUsername(userUtil.generateUsername(trainee));
-        trainee.setPassword(userUtil.generateRandomPassword());
+        String username = userUtil.generateUsername(trainee);
+        String password = userUtil.generateRandomPassword();
+        trainee.setUsername(username);
+        trainee.setPassword(passwordEncoder.encode(password));
         trainee = traineeRepository.save(trainee);
         log.info("Trainer {} successfully registered", trainee.getUsername());
-        return trainee;
-    }
-
-    public Trainee loginForTrainee(AuthRequest auth) {
-        return userUtil.authorize(auth,
-                () -> traineeRepository.findByUsername(auth.username()).get());
+        return new AuthResponse(username, password);
     }
 
     @TransactionalWithLogging

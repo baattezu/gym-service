@@ -8,8 +8,6 @@ import org.saltaonelove.dto.auth.AuthRequest;
 import java.time.LocalDate;
 
 public record TrainingRequest(
-        @NotNull
-        AuthRequest authRequest,
         @NotNull(message = "Trainee username is required")
         String traineeUsername,
         @NotNull(message = "Trainer username is required")

@@ -1,6 +1,7 @@
 package org.saltaonelove.service;
 
 import org.saltaonelove.dto.auth.AuthRequest;
+import org.saltaonelove.dto.auth.AuthResponse;
 import org.saltaonelove.dto.trainer.TrainerRequest;
 import org.saltaonelove.dto.trainer.TrainerResponse;
 import org.saltaonelove.dto.trainer.TrainerUpdateRequest;
@@ -12,6 +13,7 @@ import org.saltaonelove.util.logging.LoggingUtil;
 import org.saltaonelove.util.logging.annotation.TransactionalWithLogging;
 import org.saltaonelove.util.mapper.TrainerDtoMapper;
 import org.saltaonelove.util.mapper.TrainingDtoMapper;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -25,15 +27,17 @@ public class TrainerService {
     private TrainerRepository trainerRepository;
     private TrainingTypeRepository trainingTypeRepository;
     private UserCredentialsService userUtil;
+    private PasswordEncoder passwordEncoder;
 
-    public TrainerService(TrainerRepository trainerRepository, TrainingTypeRepository trainingTypeRepository, UserCredentialsService userUtil) {
+    public TrainerService(TrainerRepository trainerRepository, TrainingTypeRepository trainingTypeRepository, UserCredentialsService userUtil, PasswordEncoder passwordEncoder) {
         this.trainerRepository = trainerRepository;
         this.trainingTypeRepository = trainingTypeRepository;
         this.userUtil = userUtil;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @TransactionalWithLogging
-    public Trainer registerTrainer(TrainerRequest trainerRequest) {
+    public AuthResponse registerTrainer(TrainerRequest trainerRequest) {
         log.info("Registering trainer: {} {}", trainerRequest.firstName(), trainerRequest.lastName());
         Trainer trainer = new Trainer(
                 trainerRequest.firstName(), trainerRequest.lastName(),
@@ -41,16 +45,15 @@ public class TrainerService {
                         () -> new IllegalArgumentException("Specialization not found")
                 )
         );
-        trainer.setUsername(userUtil.generateUsername(trainer));
-        trainer.setPassword(userUtil.generateRandomPassword());
+        String username = userUtil.generateUsername(trainer);
+        String password = userUtil.generateRandomPassword();
+
+        trainer.setUsername(username);
+        trainer.setPassword(passwordEncoder.encode(password));
+
         trainer = trainerRepository.save(trainer);
         log.info("Trainer {} successfully registered", trainer.getUsername());
-        return trainer;
-    }
-
-    public Trainer loginForTrainer(AuthRequest auth) {
-        return userUtil.authorize(auth,
-                () -> trainerRepository.findByUsername(auth.username()).get());
+        return new AuthResponse(username, password);
     }
 
     @TransactionalWithLogging
@@ -74,9 +77,9 @@ public class TrainerService {
     }
 
     @TransactionalWithLogging
-    public TrainerResponse updateTrainer(TrainerUpdateRequest trainerRequest) {
+    public TrainerResponse updateTrainer(String username, TrainerUpdateRequest trainerRequest) {
         log.info("Updating trainer: {} {}", trainerRequest.firstName(), trainerRequest.lastName());
-        Trainer t = trainerRepository.findByUsername(trainerRequest.username()).get();
+        Trainer t = trainerRepository.findByUsername(username).get();
 
         t.setFirstName(trainerRequest.firstName());
         t.setLastName(trainerRequest.lastName());
@@ -90,7 +93,6 @@ public class TrainerService {
 
     @TransactionalWithLogging
     public Trainer changePassword(AuthRequest auth, String newPassword) {
-        loginForTrainer(auth);
         log.info("User {} is attempting to change their password", auth.username());
         Trainer trainer = trainerRepository.findByUsername(auth.username()).get();
         if (trainer.getPassword().equals(newPassword) || newPassword.length() < 10) {

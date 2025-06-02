@@ -5,6 +5,9 @@ import jakarta.security.auth.message.AuthException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageConversionException;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.client.HttpServerErrorException;
@@ -20,6 +23,9 @@ public class ExceptionCodeMapper {
     static {
         // auth
         exceptionMap.put(AuthException.class, HttpStatus.UNAUTHORIZED);
+        exceptionMap.put(BadCredentialsException.class, HttpStatus.UNAUTHORIZED);
+        exceptionMap.put(AccessDeniedException.class, HttpStatus.FORBIDDEN);
+        exceptionMap.put(LockedException.class, HttpStatus.LOCKED);
 
         // validation, client error
         exceptionMap.put(IllegalArgumentException.class, HttpStatus.BAD_REQUEST);

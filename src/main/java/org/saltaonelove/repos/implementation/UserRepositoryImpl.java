@@ -60,5 +60,16 @@ public class UserRepositoryImpl implements UserRepository {
         }
     }
 
+    @Override
+    public String findUserPositionByUsername(String username) {
+        try {
+            return entityManager.createNamedQuery("User.findUserPositionByUsername", String.class)
+                    .setParameter("username", username).getSingleResult();
+        } catch (Exception e ){
+            log.error("Error while fetching user position: {}", e.getMessage());
+            throw new IllegalArgumentException("Could not find user position with username: " + username);
+        }
+    }
+
 
 }

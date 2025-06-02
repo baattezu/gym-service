@@ -10,24 +10,29 @@ import org.saltaonelove.InitModels;
 import org.saltaonelove.dto.auth.AuthRequest;
 import org.saltaonelove.dto.auth.ChangeLoginRequest;
 import org.saltaonelove.exception.exceptions.AuthException;
+import org.saltaonelove.metrics.AuthMetrics;
 import org.saltaonelove.model.Trainee;
 import org.saltaonelove.model.Trainer;
 import org.saltaonelove.model.User;
 import org.saltaonelove.repos.UserRepository;
+import org.springframework.security.authentication.BadCredentialsException;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class UserCredentialsServiceTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private AuthMetrics authMetrics;
 
     @InjectMocks
     private UserCredentialsService userCredentialsService;
@@ -73,24 +78,6 @@ class UserCredentialsServiceTest {
         assertNotNull(password);
         assertEquals(10, password.length());
         assertTrue(password.matches("[A-Za-z0-9]{10}"));
-    }
-
-    @Test
-    void testAuthorize() {
-        AuthRequest authRequest = new AuthRequest(trainee.getUsername(), trainee.getPassword());
-        Supplier<Trainee> identityProvider = () -> trainee;
-
-        trainee = userCredentialsService.authorize(authRequest, identityProvider);
-
-        assertEquals(authRequest.username(), trainee.getUsername());
-    }
-
-    @Test
-    void testAuthorizeWrongPassword() {
-        AuthRequest authRequest = new AuthRequest(trainee.getUsername(), "WrongPassword");
-        Supplier<Trainee> identityProvider = () -> trainee;
-
-        assertThrows(AuthException.class, () -> trainee = userCredentialsService.authorize(authRequest, identityProvider));
     }
 
     @Test

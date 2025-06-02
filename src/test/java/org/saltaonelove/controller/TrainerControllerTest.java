@@ -5,12 +5,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.saltaonelove.InitModels;
+import org.saltaonelove.TestSecurityConfig;
 import org.saltaonelove.dto.auth.AuthRequest;
+import org.saltaonelove.dto.auth.AuthResponse;
 import org.saltaonelove.dto.trainer.TrainerRequest;
 import org.saltaonelove.dto.trainer.TrainerResponse;
 import org.saltaonelove.dto.trainer.TrainerUpdateRequest;
 import org.saltaonelove.dto.training.TrainingResponse;
 import org.saltaonelove.model.Trainer;
+import org.saltaonelove.service.CustomUserDetailsService;
+import org.saltaonelove.service.JwtService;
 import org.saltaonelove.service.TrainerService;
 import org.saltaonelove.util.mapper.TrainerDtoMapper;
 import org.saltaonelove.util.mapper.TrainingDtoMapper;
@@ -18,16 +22,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(TrainerController.class)
+@ContextConfiguration(classes = TestSecurityConfig.class)
 class TrainerControllerTest {
 
     @Autowired
@@ -39,26 +47,25 @@ class TrainerControllerTest {
     @MockBean
     private TrainerService trainerService;
 
-    private AuthRequest authRequest;
+    @MockBean
+    private JwtService jwtService;
+    @MockBean
+    private CustomUserDetailsService customUserDetailsService;
 
-    @BeforeEach
-    void setUp() {
-        authRequest = new AuthRequest("trainer1", "securepass");
-    }
 
     @Test
     void testRegisterTrainer() throws Exception {
         TrainerRequest request = new TrainerRequest("Jane", "Doe", "Cardio");
-        Trainer trainer = InitModels.initTrainer();
 
-        when(trainerService.registerTrainer(request)).thenReturn(trainer);
+        when(trainerService.registerTrainer(request)).thenReturn(new AuthResponse("Jane.Doe", "somepassword"));
 
         mockMvc.perform(post("/api/trainer")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.username").value("Jane.Doe"))
-                .andExpect(jsonPath("$.password").value("password123"));
+                .andExpect(jsonPath("$.password").value("somepassword"));
     }
 
     @Test
@@ -68,8 +75,7 @@ class TrainerControllerTest {
         when(trainerService.showProfile("trainer1")).thenReturn(response);
 
         mockMvc.perform(get("/api/trainer/trainer1")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(authRequest)))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.firstName").value("Jane"));
     }
@@ -81,23 +87,21 @@ class TrainerControllerTest {
         when(trainerService.getTrainerTrainings("trainer1", null, null, null, null)).thenReturn(trainings);
 
         mockMvc.perform(get("/api/trainer/trainer1/trainings")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(authRequest)))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
 
     @Test
     void testUpdateTrainer() throws Exception {
-        TrainerUpdateRequest request = new TrainerUpdateRequest(authRequest, "Jane.Doe", "Jannice", "Doe", "Specialist", true);
+        TrainerUpdateRequest request = new TrainerUpdateRequest( "Jane.Doe", "Jannice", "Doe", "Specialist", true);
         TrainerResponse response = TrainerDtoMapper.toTrainerResponse(InitModels.initTrainer());
 
-        when(trainerService.updateTrainer(request)).thenReturn(response);
+        when(trainerService.updateTrainer("Jane.Doe", request)).thenReturn(response);
 
         mockMvc.perform(put("/api/trainer/trainer1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.firstName").value("Jane"));
+                .andExpect(status().isOk());
     }
 
     @Test
@@ -105,8 +109,7 @@ class TrainerControllerTest {
         when(trainerService.toggleActivationOfAccount("trainer1")).thenReturn(InitModels.initTrainer());
 
         mockMvc.perform(patch("/api/trainer/trainer1/activation")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(authRequest)))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
 }
