@@ -41,6 +41,9 @@ class TrainingServiceTest {
     @Mock
     private TrainingTypeRepository trainingTypeRepository;
 
+    @Mock
+    private WorkloadService workloadService;
+
     @InjectMocks
     private TrainingService trainingService;
 
@@ -64,6 +67,7 @@ class TrainingServiceTest {
         doReturn(training).when(trainingRepository).save(any(Training.class));
         when(trainerRepository.findByUsername(anyString())).thenReturn(Optional.of(trainer));
         when(traineeRepository.findByUsername(anyString())).thenReturn(Optional.of(trainee));
+        when(workloadService.updateTrainerWorkload(any())).thenReturn(true);
 
         TrainingRequest trainingRequest = new TrainingRequest(trainee.getUsername(), trainer.getUsername(),"Cardio with Jane",
                 LocalDate.of(2012,12,12), 60L);
@@ -72,6 +76,17 @@ class TrainingServiceTest {
         assertNotNull(result);
 
         verify(trainingRepository, times(1)).save(any(Training.class));
+    }
+    @Test
+    void testCreateTrainingNotAddedWorkload() {
+        when(trainerRepository.findByUsername(anyString())).thenReturn(Optional.of(trainer));
+        when(traineeRepository.findByUsername(anyString())).thenReturn(Optional.of(trainee));
+        when(workloadService.updateTrainerWorkload(any())).thenReturn(false);
+
+        TrainingRequest trainingRequest = new TrainingRequest(trainee.getUsername(), trainer.getUsername(),"Cardio with Jane",
+                LocalDate.of(2012,12,12), 60L);
+
+        assertThrows(RuntimeException.class, () -> trainingService.createTraining(trainingRequest));
     }
 
     @Test

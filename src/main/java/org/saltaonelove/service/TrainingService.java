@@ -1,8 +1,9 @@
 package org.saltaonelove.service;
 
 import jakarta.persistence.EntityNotFoundException;
-import org.saltaonelove.dto.training.TrainingDTO;
 import org.saltaonelove.dto.training.TrainingRequest;
+import org.saltaonelove.dto.workload.ActionType;
+import org.saltaonelove.dto.workload.WorkloadRequest;
 import org.saltaonelove.model.Trainee;
 import org.saltaonelove.model.Trainer;
 import org.saltaonelove.model.Training;
@@ -11,11 +12,9 @@ import org.saltaonelove.repos.TraineeRepository;
 import org.saltaonelove.repos.TrainerRepository;
 import org.saltaonelove.repos.TrainingRepository;
 import org.saltaonelove.repos.TrainingTypeRepository;
+import org.saltaonelove.util.logging.LoggingUtil;
 import org.saltaonelove.util.logging.annotation.TransactionalWithLogging;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -23,18 +22,20 @@ import java.util.NoSuchElementException;
 @Service
 public class TrainingService {
 
-    private static final Logger log = LoggerFactory.getLogger(TrainingService.class);
+    private static final LoggingUtil log = LoggingUtil.getLogger(TrainerService.class);
 
     private TraineeRepository traineeRepository;
     private TrainerRepository trainerRepository;
     private TrainingTypeRepository trainingTypeRepository;
     private TrainingRepository trainingRepository;
+    private WorkloadService workloadService;
 
-    public TrainingService(TraineeRepository traineeRepository, TrainerRepository trainerRepository, TrainingTypeRepository trainingTypeRepository, TrainingRepository trainingRepository) {
+    public TrainingService(TraineeRepository traineeRepository, TrainerRepository trainerRepository, TrainingTypeRepository trainingTypeRepository, TrainingRepository trainingRepository, WorkloadService workloadService) {
         this.traineeRepository = traineeRepository;
         this.trainerRepository = trainerRepository;
         this.trainingTypeRepository = trainingTypeRepository;
         this.trainingRepository = trainingRepository;
+        this.workloadService = workloadService;
     }
 
     @TransactionalWithLogging
@@ -55,9 +56,21 @@ public class TrainingService {
         training.setDate(trainingDTO.trainingDate());
         training.setDuration(trainingDTO.duration());
 
-        training = trainingRepository.save(training);
-        log.info("Created training {}", trainingDTO);
-        return training;
+        Boolean addedWorkload = workloadService.updateTrainerWorkload(
+                new WorkloadRequest(
+                        trainer.getUsername(), trainer.getFirstName(),
+                        trainer.getLastName(), trainer.isActive(),
+                        training.getDate(), training.getDuration(),
+                        ActionType.ADD
+                )
+        );
+
+        if (addedWorkload) {
+            log.info("Created training {}", trainingDTO);
+            return trainingRepository.save(training);
+        } else {
+            throw new RuntimeException("Failed to add workload");
+        }
     }
 
     public List<Training> listTrainings() {

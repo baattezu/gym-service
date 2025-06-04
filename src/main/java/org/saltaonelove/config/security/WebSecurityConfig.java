@@ -1,7 +1,7 @@
 package org.saltaonelove.config.security;
 
 import org.saltaonelove.config.filter.JwtAuthFilter;
-import org.saltaonelove.service.CustomUserDetailsService;
+import org.saltaonelove.service.auth.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;

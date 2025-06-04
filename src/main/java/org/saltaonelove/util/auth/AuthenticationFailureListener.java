@@ -1,8 +1,7 @@
 package org.saltaonelove.util.auth;
 
 import jakarta.servlet.http.HttpServletRequest;
-import org.saltaonelove.service.LoginAttemptService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.saltaonelove.service.auth.LoginAttemptService;
 import org.springframework.context.ApplicationListener;
 import org.springframework.security.authentication.event.AuthenticationFailureBadCredentialsEvent;
 import org.springframework.stereotype.Component;

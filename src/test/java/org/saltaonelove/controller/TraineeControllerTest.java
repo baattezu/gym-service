@@ -1,12 +1,10 @@
 package org.saltaonelove.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.saltaonelove.InitModels;
 import org.saltaonelove.TestSecurityConfig;
-import org.saltaonelove.dto.auth.AuthRequest;
 import org.saltaonelove.dto.auth.AuthResponse;
 import org.saltaonelove.dto.trainee.TraineeRegisterRequest;
 import org.saltaonelove.dto.trainee.TraineeResponse;
@@ -14,9 +12,8 @@ import org.saltaonelove.dto.trainee.TraineeUpdateRequest;
 import org.saltaonelove.dto.trainee.TraineeUpdateTrainersRequest;
 import org.saltaonelove.dto.trainer.TrainerResponse;
 import org.saltaonelove.dto.training.TrainingResponse;
-import org.saltaonelove.model.Trainee;
-import org.saltaonelove.service.CustomUserDetailsService;
-import org.saltaonelove.service.JwtService;
+import org.saltaonelove.service.auth.CustomUserDetailsService;
+import org.saltaonelove.service.auth.JwtService;
 import org.saltaonelove.service.TraineeService;
 import org.saltaonelove.util.mapper.TraineeDtoMapper;
 import org.saltaonelove.util.mapper.TrainerDtoMapper;
