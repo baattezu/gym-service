@@ -11,7 +11,6 @@ import org.saltaonelove.exception.ErrorResponse;
 import org.saltaonelove.service.auth.CustomUserDetailsService;
 import org.saltaonelove.service.auth.JwtService;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -27,10 +26,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private JwtService jwtService;
     private UserDetailsService userDetailsService;
 
-    public JwtAuthFilter(
-            JwtService jwtService,
-            CustomUserDetailsService userDetailsService
-    ) {
+    public JwtAuthFilter(JwtService jwtService, CustomUserDetailsService userDetailsService){
         this.jwtService = jwtService;
         this.userDetailsService = userDetailsService;
     }

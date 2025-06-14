@@ -1,6 +1,7 @@
 package org.saltaonelove.service;
 
 import jakarta.persistence.EntityNotFoundException;
+import org.saltaonelove.clients.workload.WorkloadClient;
 import org.saltaonelove.dto.training.TrainingRequest;
 import org.saltaonelove.dto.workload.ActionType;
 import org.saltaonelove.dto.workload.WorkloadRequest;
@@ -28,14 +29,14 @@ public class TrainingService {
     private TrainerRepository trainerRepository;
     private TrainingTypeRepository trainingTypeRepository;
     private TrainingRepository trainingRepository;
-    private WorkloadService workloadService;
+    private WorkloadClient workloadClient;
 
-    public TrainingService(TraineeRepository traineeRepository, TrainerRepository trainerRepository, TrainingTypeRepository trainingTypeRepository, TrainingRepository trainingRepository, WorkloadService workloadService) {
+    public TrainingService(TraineeRepository traineeRepository, TrainerRepository trainerRepository, TrainingTypeRepository trainingTypeRepository, TrainingRepository trainingRepository, WorkloadClient workloadClient) {
         this.traineeRepository = traineeRepository;
         this.trainerRepository = trainerRepository;
         this.trainingTypeRepository = trainingTypeRepository;
         this.trainingRepository = trainingRepository;
-        this.workloadService = workloadService;
+        this.workloadClient = workloadClient;
     }
 
     @TransactionalWithLogging
@@ -56,21 +57,14 @@ public class TrainingService {
         training.setDate(trainingDTO.trainingDate());
         training.setDuration(trainingDTO.duration());
 
-        Boolean addedWorkload = workloadService.updateTrainerWorkload(
-                new WorkloadRequest(
-                        trainer.getUsername(), trainer.getFirstName(),
-                        trainer.getLastName(), trainer.isActive(),
-                        training.getDate(), training.getDuration(),
-                        ActionType.ADD
-                )
-        );
+        workloadClient.sendTrainerWorkload(new WorkloadRequest(
+                trainer.getUsername(), trainer.getFirstName(),
+                trainer.getLastName(), trainer.isActive(),
+                training.getDate(), training.getDuration(),
+                ActionType.ADD
+        ));
 
-        if (addedWorkload) {
-            log.info("Created training {}", trainingDTO);
-            return trainingRepository.save(training);
-        } else {
-            throw new RuntimeException("Failed to add workload");
-        }
+        return trainingRepository.save(training);
     }
 
     public List<Training> listTrainings() {

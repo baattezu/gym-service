@@ -7,9 +7,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.saltaonelove.InitModels;
+import org.saltaonelove.clients.workload.WorkloadClient;
 import org.saltaonelove.dto.auth.AuthRequest;
 import org.saltaonelove.dto.training.TrainingDTO;
 import org.saltaonelove.dto.training.TrainingRequest;
+import org.saltaonelove.dto.workload.WorkloadRequest;
 import org.saltaonelove.model.Trainee;
 import org.saltaonelove.model.Trainer;
 import org.saltaonelove.model.Training;
@@ -42,7 +44,7 @@ class TrainingServiceTest {
     private TrainingTypeRepository trainingTypeRepository;
 
     @Mock
-    private WorkloadService workloadService;
+    private WorkloadClient workloadClient;
 
     @InjectMocks
     private TrainingService trainingService;
@@ -67,7 +69,6 @@ class TrainingServiceTest {
         doReturn(training).when(trainingRepository).save(any(Training.class));
         when(trainerRepository.findByUsername(anyString())).thenReturn(Optional.of(trainer));
         when(traineeRepository.findByUsername(anyString())).thenReturn(Optional.of(trainee));
-        when(workloadService.updateTrainerWorkload(any())).thenReturn(true);
 
         TrainingRequest trainingRequest = new TrainingRequest(trainee.getUsername(), trainer.getUsername(),"Cardio with Jane",
                 LocalDate.of(2012,12,12), 60L);
@@ -76,17 +77,6 @@ class TrainingServiceTest {
         assertNotNull(result);
 
         verify(trainingRepository, times(1)).save(any(Training.class));
-    }
-    @Test
-    void testCreateTrainingNotAddedWorkload() {
-        when(trainerRepository.findByUsername(anyString())).thenReturn(Optional.of(trainer));
-        when(traineeRepository.findByUsername(anyString())).thenReturn(Optional.of(trainee));
-        when(workloadService.updateTrainerWorkload(any())).thenReturn(false);
-
-        TrainingRequest trainingRequest = new TrainingRequest(trainee.getUsername(), trainer.getUsername(),"Cardio with Jane",
-                LocalDate.of(2012,12,12), 60L);
-
-        assertThrows(RuntimeException.class, () -> trainingService.createTraining(trainingRequest));
     }
 
     @Test
