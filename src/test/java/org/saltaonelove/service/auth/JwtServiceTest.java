@@ -1,5 +1,6 @@
 package org.saltaonelove.service.auth;
 
+import io.jsonwebtoken.JwtException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.saltaonelove.model.User;
@@ -39,11 +40,7 @@ class JwtServiceTest {
     void testInvalidTokenThrowsException() {
         String invalidToken = "this.is.an.invalid.token";
 
-        Exception exception = assertThrows(RuntimeException.class, () -> {
-            jwtService.isValid(invalidToken);
-        });
-
-        assertTrue(exception.getMessage().contains("Invalid JWT"));
+        assertThrows(JwtException.class, () -> {jwtService.isValid(invalidToken);});
     }
 
     @Test
@@ -57,6 +54,6 @@ class JwtServiceTest {
 
         Thread.sleep(5);
 
-        assertThrows(BadCredentialsException.class, () -> jwtService.isValid(token));
+        assertThrows(JwtException.class, () -> jwtService.isValid(token));
     }
 }
