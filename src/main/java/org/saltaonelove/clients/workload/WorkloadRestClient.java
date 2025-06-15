@@ -57,9 +57,8 @@ public class WorkloadRestClient implements WorkloadClient {
         }
     }
 
-    private Boolean recoverMethod(WorkloadRequest request, Throwable ex) {
+    private void recoverMethod(WorkloadRequest request, Throwable ex) {
         log.warn("Fallback triggered due to: {}", ex.toString());
-        return false;
     }
 
 }
