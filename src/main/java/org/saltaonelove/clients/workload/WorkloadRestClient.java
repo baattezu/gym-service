@@ -22,7 +22,7 @@ public class WorkloadRestClient implements WorkloadClient {
         this.restTemplate = restTemplate;
     }
 
-    @CircuitBreaker(name = "workloadService", fallbackMethod = "recoverMethod")
+    @CircuitBreaker(name = "workloadService", fallbackMethod = "recoverMethodForUpdatingWorkload")
     public void updateTrainerWorkload(WorkloadRequest workloadRequest) {
         String token = JwtUtil.getJwtTokenFromContext();
 
@@ -40,7 +40,7 @@ public class WorkloadRestClient implements WorkloadClient {
         }
     }
 
-    @CircuitBreaker(name = "workloadService", fallbackMethod = "recoverMethod")
+    @CircuitBreaker(name = "workloadService", fallbackMethod = "recoverMethodForDeletionHistory")
     public void deleteTrainerWorkloadHistory(String username) {
         String token = JwtUtil.getJwtTokenFromContext();
 
@@ -48,8 +48,10 @@ public class WorkloadRestClient implements WorkloadClient {
         headers.set("TransactionId", MDC.get("transactionId"));
         headers.setBearerAuth(token);
 
+        HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
+
         ResponseEntity<Void> response = restTemplate.exchange(
-                WORKLOAD_URL + "/" + username, HttpMethod.DELETE, null, Void.class
+                WORKLOAD_URL + "/" + username, HttpMethod.DELETE, requestEntity, Void.class
         );
 
         if (!response.getStatusCode().is2xxSuccessful()){
@@ -57,8 +59,12 @@ public class WorkloadRestClient implements WorkloadClient {
         }
     }
 
-    private void recoverMethod(WorkloadRequest request, Throwable ex) {
+    private void recoverMethodForUpdatingWorkload(WorkloadRequest request, Throwable ex) {
         log.warn("Fallback triggered due to: {}", ex.toString());
     }
+    private void recoverMethodForDeletionHistory(String username, Throwable ex) {
+        log.warn("Fallback triggered due to: {}", ex.toString());
+    }
+
 
 }

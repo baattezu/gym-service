@@ -77,6 +77,7 @@ class TrainingServiceTest {
         assertNotNull(result);
 
         verify(trainingRepository, times(1)).save(any(Training.class));
+        verify(workloadClient).updateTrainerWorkload(any(WorkloadRequest.class));
     }
 
     @Test
@@ -86,6 +87,7 @@ class TrainingServiceTest {
         trainingService.cancelTraining(training.getTrainingId());
 
         verify(trainingRepository, times(1)).delete(anyLong());
+        verify(workloadClient).updateTrainerWorkload(any(WorkloadRequest.class));
     }
 
     @Test

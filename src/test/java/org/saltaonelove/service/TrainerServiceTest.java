@@ -176,6 +176,6 @@ class TrainerServiceTest {
         trainerService.deleteTrainer(trainerAuth.username());
 
         verify(trainerRepository).findByUsername(trainerAuth.username());
-        verify(trainerRepository, never()).save(any(Trainer.class));
+        verify(workloadClient).deleteTrainerWorkloadHistory(any(String.class));
     }
 }
