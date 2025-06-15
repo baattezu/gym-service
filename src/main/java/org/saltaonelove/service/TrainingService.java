@@ -57,14 +57,13 @@ public class TrainingService {
         training.setDate(trainingDTO.trainingDate());
         training.setDuration(trainingDTO.duration());
 
-        workloadClient.sendTrainerWorkload(new WorkloadRequest(
-                trainer.getUsername(), trainer.getFirstName(),
-                trainer.getLastName(), trainer.isActive(),
-                training.getDate(), training.getDuration(),
-                ActionType.ADD
-        ));
+        training = trainingRepository.save(training);
 
-        return trainingRepository.save(training);
+        workloadClient.updateTrainerWorkload(
+                training.toWorkloadRequest(ActionType.ADD)
+        );
+
+        return training;
     }
 
     public List<Training> listTrainings() {
@@ -83,4 +82,14 @@ public class TrainingService {
         return trainingTypeRepository.findAll();
     }
 
+    @TransactionalWithLogging
+    public void cancelTraining(Long id) {
+        log.info("Cancelling training {}", id);
+        Training training = getTraining(id);
+        trainingRepository.delete(id);
+
+        workloadClient.updateTrainerWorkload(
+                training.toWorkloadRequest(ActionType.DELETE)
+        );
+    }
 }

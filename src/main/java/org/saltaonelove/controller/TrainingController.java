@@ -41,4 +41,11 @@ public class TrainingController {
         return ResponseEntity.ok().body(trainingService.getTrainingTypes());
     }
 
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Cancel training", security = @SecurityRequirement(name = "Bearer Authentication"))
+    public ResponseEntity<Void> cancelTraining(@PathVariable Long id){
+        trainingService.cancelTraining(id);
+        return ResponseEntity.ok().build();
+    }
+
 }

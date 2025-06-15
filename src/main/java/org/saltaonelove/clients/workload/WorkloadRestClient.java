@@ -6,6 +6,7 @@ import org.saltaonelove.util.auth.JwtUtil;
 import org.slf4j.MDC;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -22,7 +23,7 @@ public class WorkloadRestClient implements WorkloadClient {
     }
 
     @CircuitBreaker(name = "workloadService", fallbackMethod = "recoverMethod")
-    public void sendTrainerWorkload(WorkloadRequest workloadRequest) {
+    public void updateTrainerWorkload(WorkloadRequest workloadRequest) {
         String token = JwtUtil.getJwtTokenFromContext();
 
         HttpHeaders headers = new HttpHeaders();
@@ -31,11 +32,28 @@ public class WorkloadRestClient implements WorkloadClient {
 
         HttpEntity<WorkloadRequest> requestEntity = new HttpEntity<>(workloadRequest, headers);
 
-        ResponseEntity<Void> addWorkload = restTemplate.postForEntity(
+        ResponseEntity<Void> response = restTemplate.postForEntity(
                 WORKLOAD_URL, requestEntity, Void.class);
 
-        if (!addWorkload.getStatusCode().is2xxSuccessful()){
-            throw new IllegalStateException("Failed to add workload");
+        if (!response.getStatusCode().is2xxSuccessful()){
+            log.warn(response.getBody().toString());
+        }
+    }
+
+    @CircuitBreaker(name = "workloadService", fallbackMethod = "recoverMethod")
+    public void deleteTrainerWorkloadHistory(String username) {
+        String token = JwtUtil.getJwtTokenFromContext();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("TransactionId", MDC.get("transactionId"));
+        headers.setBearerAuth(token);
+
+        ResponseEntity<Void> response = restTemplate.exchange(
+                WORKLOAD_URL + "/" + username, HttpMethod.DELETE, null, Void.class
+        );
+
+        if (!response.getStatusCode().is2xxSuccessful()){
+            log.warn(response.getBody().toString());
         }
     }
 

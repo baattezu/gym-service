@@ -80,6 +80,15 @@ class TrainingServiceTest {
     }
 
     @Test
+    void testCancelTraining() {
+        when(trainingRepository.findById(anyLong())).thenReturn(Optional.of(training));
+
+        trainingService.cancelTraining(training.getTrainingId());
+
+        verify(trainingRepository, times(1)).delete(anyLong());
+    }
+
+    @Test
     void testListTrainings() {
         when(trainingRepository.findAll()).thenReturn(List.of(training));
 
