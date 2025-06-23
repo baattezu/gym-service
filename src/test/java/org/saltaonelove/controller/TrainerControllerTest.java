@@ -2,19 +2,16 @@ package org.saltaonelove.controller;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.saltaonelove.InitModels;
 import org.saltaonelove.TestSecurityConfig;
-import org.saltaonelove.dto.auth.AuthRequest;
 import org.saltaonelove.dto.auth.AuthResponse;
 import org.saltaonelove.dto.trainer.TrainerRequest;
 import org.saltaonelove.dto.trainer.TrainerResponse;
 import org.saltaonelove.dto.trainer.TrainerUpdateRequest;
 import org.saltaonelove.dto.training.TrainingResponse;
-import org.saltaonelove.model.Trainer;
-import org.saltaonelove.service.CustomUserDetailsService;
-import org.saltaonelove.service.JwtService;
+import org.saltaonelove.service.auth.CustomUserDetailsService;
+import org.saltaonelove.service.auth.JwtService;
 import org.saltaonelove.service.TrainerService;
 import org.saltaonelove.util.mapper.TrainerDtoMapper;
 import org.saltaonelove.util.mapper.TrainingDtoMapper;
@@ -22,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 

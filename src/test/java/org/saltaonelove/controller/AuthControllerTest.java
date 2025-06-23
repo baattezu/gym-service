@@ -2,15 +2,14 @@ package org.saltaonelove.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.saltaonelove.TestSecurityConfig;
 import org.saltaonelove.dto.auth.AuthRequest;
 import org.saltaonelove.dto.auth.AuthResponse;
 import org.saltaonelove.dto.auth.ChangeLoginRequest;
-import org.saltaonelove.service.CustomUserDetailsService;
-import org.saltaonelove.service.JwtService;
-import org.saltaonelove.service.LoginAttemptService;
+import org.saltaonelove.service.auth.CustomUserDetailsService;
+import org.saltaonelove.service.auth.JwtService;
+import org.saltaonelove.service.auth.LoginAttemptService;
 import org.saltaonelove.service.UserCredentialsService;
 import org.saltaonelove.util.auth.LoginAttemptUtils;
 import org.springframework.beans.factory.annotation.Autowired;

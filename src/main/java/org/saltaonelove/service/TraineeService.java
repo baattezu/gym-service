@@ -1,6 +1,5 @@
 package org.saltaonelove.service;
 
-import org.saltaonelove.dto.auth.AuthRequest;
 import org.saltaonelove.dto.auth.AuthResponse;
 import org.saltaonelove.dto.trainee.TraineeRegisterRequest;
 import org.saltaonelove.dto.trainee.TraineeResponse;

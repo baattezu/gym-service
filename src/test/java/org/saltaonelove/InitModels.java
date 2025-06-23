@@ -62,6 +62,7 @@ public class InitModels {
         TrainingType trainingType = initTrainingType();
 
         Training training = new Training();
+        training.setTrainingId(1L);
         training.setTrainingType(trainingType);
         training.setTrainee(trainee);
         training.setTrainer(trainer);

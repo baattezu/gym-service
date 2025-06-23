@@ -3,32 +3,24 @@ package org.saltaonelove.service;
 import org.saltaonelove.dto.auth.AuthRequest;
 import org.saltaonelove.dto.auth.AuthResponse;
 import org.saltaonelove.dto.auth.ChangeLoginRequest;
-import org.saltaonelove.exception.exceptions.AuthException;
 import org.saltaonelove.metrics.AuthMetrics;
-import org.saltaonelove.model.Trainer;
 import org.saltaonelove.model.User;
-import org.saltaonelove.repos.TraineeRepository;
-import org.saltaonelove.repos.TrainerRepository;
 import org.saltaonelove.repos.UserRepository;
-import org.saltaonelove.util.auth.LoginAttemptUtils;
+import org.saltaonelove.service.auth.CustomUserDetailsService;
+import org.saltaonelove.service.auth.JwtService;
 import org.saltaonelove.util.logging.annotation.TransactionalWithLogging;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
-import java.util.function.Supplier;
+import java.util.Map;
 
 @Service("userCredentialsService")
 public class UserCredentialsService{
@@ -98,8 +90,10 @@ public class UserCredentialsService{
     public AuthResponse login(AuthRequest auth) {
         authorize(auth);
         User user = userRepository.findByUsername(auth.username()).get();
+        Map<String, Object> extraClaims = new HashMap<>();
+        extraClaims.put("roles", List.of(userRepository.findUserPositionByUsername(user.getUsername())));
 
-        String token = jwtService.generateToken(user);
+        String token = jwtService.generateToken(extraClaims, user);
         authMetrics.onSuccessfulLogin(user.getUserId());
 
         return new AuthResponse(token);

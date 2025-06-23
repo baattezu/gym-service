@@ -1,16 +1,13 @@
 package org.saltaonelove.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.saltaonelove.dto.auth.AuthRequest;
 import org.saltaonelove.dto.auth.AuthResponse;
 import org.saltaonelove.dto.auth.ChangeLoginRequest;
-import org.saltaonelove.model.User;
-import org.saltaonelove.service.LoginAttemptService;
+import org.saltaonelove.service.auth.LoginAttemptService;
 import org.saltaonelove.service.UserCredentialsService;
 import org.saltaonelove.util.auth.LoginAttemptUtils;
 import org.saltaonelove.util.logging.annotation.LogRestCall;

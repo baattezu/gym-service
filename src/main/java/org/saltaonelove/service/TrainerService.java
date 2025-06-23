@@ -1,5 +1,6 @@
 package org.saltaonelove.service;
 
+import org.saltaonelove.clients.workload.WorkloadClient;
 import org.saltaonelove.dto.auth.AuthRequest;
 import org.saltaonelove.dto.auth.AuthResponse;
 import org.saltaonelove.dto.trainer.TrainerRequest;
@@ -28,12 +29,14 @@ public class TrainerService {
     private TrainingTypeRepository trainingTypeRepository;
     private UserCredentialsService userUtil;
     private PasswordEncoder passwordEncoder;
+    private WorkloadClient workloadClient;
 
-    public TrainerService(TrainerRepository trainerRepository, TrainingTypeRepository trainingTypeRepository, UserCredentialsService userUtil, PasswordEncoder passwordEncoder) {
+    public TrainerService(TrainerRepository trainerRepository, TrainingTypeRepository trainingTypeRepository, UserCredentialsService userUtil, PasswordEncoder passwordEncoder, WorkloadClient workloadClient) {
         this.trainerRepository = trainerRepository;
         this.trainingTypeRepository = trainingTypeRepository;
         this.userUtil = userUtil;
         this.passwordEncoder = passwordEncoder;
+        this.workloadClient = workloadClient;
     }
 
     @TransactionalWithLogging
@@ -111,6 +114,14 @@ public class TrainerService {
         return trainerRepository.findTrainerTrainingsByUsernameAndCriteria(
                 username, fromDate, toDate, traineeName, trainingType)
                 .stream().map(TrainingDtoMapper::toTrainingResponse).toList();
+    }
+
+    @TransactionalWithLogging
+    public void deleteTrainer(String username) {
+        log.info("Deleting trainer {}", username);
+        Trainer trainer = trainerRepository.findByUsername(username).get();
+        trainerRepository.delete(trainer.getUserId());
+        workloadClient.deleteTrainerWorkloadHistory(username);
     }
 
 }

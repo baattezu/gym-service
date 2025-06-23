@@ -1,8 +1,10 @@
 package org.saltaonelove.service;
 
 import jakarta.persistence.EntityNotFoundException;
-import org.saltaonelove.dto.training.TrainingDTO;
+import org.saltaonelove.clients.workload.WorkloadClient;
 import org.saltaonelove.dto.training.TrainingRequest;
+import org.saltaonelove.dto.workload.ActionType;
+import org.saltaonelove.dto.workload.WorkloadRequest;
 import org.saltaonelove.model.Trainee;
 import org.saltaonelove.model.Trainer;
 import org.saltaonelove.model.Training;
@@ -11,11 +13,9 @@ import org.saltaonelove.repos.TraineeRepository;
 import org.saltaonelove.repos.TrainerRepository;
 import org.saltaonelove.repos.TrainingRepository;
 import org.saltaonelove.repos.TrainingTypeRepository;
+import org.saltaonelove.util.logging.LoggingUtil;
 import org.saltaonelove.util.logging.annotation.TransactionalWithLogging;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -23,18 +23,20 @@ import java.util.NoSuchElementException;
 @Service
 public class TrainingService {
 
-    private static final Logger log = LoggerFactory.getLogger(TrainingService.class);
+    private static final LoggingUtil log = LoggingUtil.getLogger(TrainerService.class);
 
     private TraineeRepository traineeRepository;
     private TrainerRepository trainerRepository;
     private TrainingTypeRepository trainingTypeRepository;
     private TrainingRepository trainingRepository;
+    private WorkloadClient workloadClient;
 
-    public TrainingService(TraineeRepository traineeRepository, TrainerRepository trainerRepository, TrainingTypeRepository trainingTypeRepository, TrainingRepository trainingRepository) {
+    public TrainingService(TraineeRepository traineeRepository, TrainerRepository trainerRepository, TrainingTypeRepository trainingTypeRepository, TrainingRepository trainingRepository, WorkloadClient workloadClient) {
         this.traineeRepository = traineeRepository;
         this.trainerRepository = trainerRepository;
         this.trainingTypeRepository = trainingTypeRepository;
         this.trainingRepository = trainingRepository;
+        this.workloadClient = workloadClient;
     }
 
     @TransactionalWithLogging
@@ -56,7 +58,11 @@ public class TrainingService {
         training.setDuration(trainingDTO.duration());
 
         training = trainingRepository.save(training);
-        log.info("Created training {}", trainingDTO);
+
+        workloadClient.updateTrainerWorkload(
+                training.toWorkloadRequest(ActionType.ADD)
+        );
+
         return training;
     }
 
@@ -76,4 +82,14 @@ public class TrainingService {
         return trainingTypeRepository.findAll();
     }
 
+    @TransactionalWithLogging
+    public void cancelTraining(Long id) {
+        log.info("Cancelling training {}", id);
+        Training training = getTraining(id);
+        trainingRepository.delete(id);
+
+        workloadClient.updateTrainerWorkload(
+                training.toWorkloadRequest(ActionType.DELETE)
+        );
+    }
 }

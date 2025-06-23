@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+import org.saltaonelove.dto.workload.ActionType;
+import org.saltaonelove.dto.workload.WorkloadRequest;
 
 import java.time.LocalDate;
 
@@ -53,4 +55,15 @@ public class Training {
                 trainingId, trainer.getUsername(), trainee.getUsername(), trainingName, trainingType.getName(), date, duration);
     }
 
+    public WorkloadRequest toWorkloadRequest(ActionType actionType) {
+        return new WorkloadRequest(
+                trainer.getUsername(),
+                trainer.getFirstName(),
+                trainer.getLastName(),
+                trainer.isActive(),
+                date,
+                duration,
+                actionType
+        );
+    }
 }

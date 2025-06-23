@@ -4,13 +4,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.saltaonelove.dto.auth.AuthRequest;
 import org.saltaonelove.dto.auth.AuthResponse;
 import org.saltaonelove.dto.trainer.TrainerRequest;
 import org.saltaonelove.dto.trainer.TrainerResponse;
 import org.saltaonelove.dto.trainer.TrainerUpdateRequest;
 import org.saltaonelove.dto.training.TrainingResponse;
-import org.saltaonelove.model.Trainer;
 import org.saltaonelove.service.TrainerService;
 import org.saltaonelove.util.logging.annotation.LogRestCall;
 import org.springframework.http.HttpStatus;
@@ -82,6 +80,16 @@ public class TrainerController {
         trainerService.toggleActivationOfAccount(username);
         return ResponseEntity.ok().build();
     }
+
+    @DeleteMapping("/{username}")
+    @Operation(summary = "Delete trainer by username", tags = {"Trainer"},
+            security = @SecurityRequirement(name = "Bearer Authentication"))
+    @PreAuthorize("hasRole('TRAINER')")
+    public ResponseEntity<TrainerResponse> deleteTrainer(@PathVariable String username){
+        trainerService.deleteTrainer(username);
+        return ResponseEntity.ok().build();
+    }
+
 
 
 }

@@ -7,9 +7,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.saltaonelove.InitModels;
+import org.saltaonelove.clients.workload.WorkloadClient;
 import org.saltaonelove.dto.auth.AuthRequest;
 import org.saltaonelove.dto.training.TrainingDTO;
 import org.saltaonelove.dto.training.TrainingRequest;
+import org.saltaonelove.dto.workload.WorkloadRequest;
 import org.saltaonelove.model.Trainee;
 import org.saltaonelove.model.Trainer;
 import org.saltaonelove.model.Training;
@@ -40,6 +42,9 @@ class TrainingServiceTest {
 
     @Mock
     private TrainingTypeRepository trainingTypeRepository;
+
+    @Mock
+    private WorkloadClient workloadClient;
 
     @InjectMocks
     private TrainingService trainingService;
@@ -72,6 +77,17 @@ class TrainingServiceTest {
         assertNotNull(result);
 
         verify(trainingRepository, times(1)).save(any(Training.class));
+        verify(workloadClient).updateTrainerWorkload(any(WorkloadRequest.class));
+    }
+
+    @Test
+    void testCancelTraining() {
+        when(trainingRepository.findById(anyLong())).thenReturn(Optional.of(training));
+
+        trainingService.cancelTraining(training.getTrainingId());
+
+        verify(trainingRepository, times(1)).delete(anyLong());
+        verify(workloadClient).updateTrainerWorkload(any(WorkloadRequest.class));
     }
 
     @Test

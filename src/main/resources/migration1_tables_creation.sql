@@ -30,8 +30,8 @@ CREATE TABLE IF NOT EXISTS trainee_trainer(
     trainee_id BIGINT,
     trainer_id BIGINT,
     PRIMARY KEY(trainee_id, trainer_id),
-    FOREIGN KEY (trainee_id) REFERENCES trainee(trainee_id),
-    FOREIGN KEY (trainer_id) REFERENCES trainer(trainer_id)
+    FOREIGN KEY (trainee_id) REFERENCES trainee(trainee_id) ON DELETE CASCADE,
+    FOREIGN KEY (trainer_id) REFERENCES trainer(trainer_id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS training(

@@ -7,6 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.saltaonelove.InitModels;
+import org.saltaonelove.clients.workload.WorkloadClient;
 import org.saltaonelove.dto.auth.AuthRequest;
 import org.saltaonelove.dto.auth.AuthResponse;
 import org.saltaonelove.dto.trainer.TrainerRequest;
@@ -37,6 +38,9 @@ class TrainerServiceTest {
 
     @Mock
     private UserCredentialsService userUtil;
+
+    @Mock
+    private WorkloadClient workloadClient;
 
     @InjectMocks
     private TrainerService trainerService;
@@ -163,5 +167,15 @@ class TrainerServiceTest {
         assertNotNull(result);
 
         verify(trainerRepository).findByUsername(trainerAuth.username());
+    }
+
+    @Test
+    void testDeleteTrainer() {
+        when(trainerRepository.findByUsername(trainerAuth.username())).thenReturn(Optional.ofNullable(trainer));
+
+        trainerService.deleteTrainer(trainerAuth.username());
+
+        verify(trainerRepository).findByUsername(trainerAuth.username());
+        verify(workloadClient).deleteTrainerWorkloadHistory(any(String.class));
     }
 }

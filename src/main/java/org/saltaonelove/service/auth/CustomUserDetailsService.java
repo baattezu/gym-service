@@ -1,4 +1,4 @@
-package org.saltaonelove.service;
+package org.saltaonelove.service.auth;
 
 import org.saltaonelove.model.User;
 import org.saltaonelove.repos.UserRepository;

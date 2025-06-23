@@ -8,8 +8,8 @@ import org.saltaonelove.TestSecurityConfig;
 import org.saltaonelove.dto.auth.AuthRequest;
 import org.saltaonelove.dto.training.TrainingRequest;
 import org.saltaonelove.model.TrainingType;
-import org.saltaonelove.service.CustomUserDetailsService;
-import org.saltaonelove.service.JwtService;
+import org.saltaonelove.service.auth.CustomUserDetailsService;
+import org.saltaonelove.service.auth.JwtService;
 import org.saltaonelove.service.TrainingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -21,9 +21,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.time.LocalDate;
 import java.util.List;
 
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(TrainingController.class)
@@ -62,6 +62,15 @@ class TrainingControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    void testDeleteTraining() throws Exception {
+        Long trainingId = InitModels.initTraining().getTrainingId();
+
+        mockMvc.perform(delete("/api/training/"+trainingId))
+                .andExpect(status().isOk());
+        verify(trainingService).cancelTraining(InitModels.initTraining().getTrainingId());
     }
 
     @Test
