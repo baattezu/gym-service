@@ -5,14 +5,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.saltaonelove.dto.training.TrainingRequest;
+import org.saltaonelove.gymshared.util.logging.annotation.LogRestCall;
 import org.saltaonelove.model.TrainingType;
 import org.saltaonelove.service.TrainingService;
-import org.saltaonelove.util.logging.annotation.LogRestCall;
-import org.springframework.cloud.client.loadbalancer.LoadBalanced;
-import org.springframework.context.annotation.Bean;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 

@@ -9,7 +9,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.saltaonelove.InitModels;
 import org.saltaonelove.clients.workload.WorkloadClient;
 import org.saltaonelove.dto.auth.AuthRequest;
-import org.saltaonelove.dto.training.TrainingDTO;
 import org.saltaonelove.dto.training.TrainingRequest;
 import org.saltaonelove.dto.workload.WorkloadRequest;
 import org.saltaonelove.model.Trainee;

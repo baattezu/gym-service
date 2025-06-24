@@ -2,7 +2,9 @@ package org.saltaonelove.clients.workload;
 
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import org.saltaonelove.dto.workload.WorkloadRequest;
-import org.saltaonelove.util.auth.JwtUtil;
+import org.saltaonelove.gymshared.util.auth.JwtUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -11,12 +13,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import static org.saltaonelove.exception.GlobalExceptionHandler.log;
-
 @Component
 public class WorkloadRestClient implements WorkloadClient {
     private final RestTemplate restTemplate;
     private static final String WORKLOAD_URL = "http://gym-shift-calculation-service:8082/api/workload";
+
+    private static final Logger log = LoggerFactory.getLogger(WorkloadRestClient.class);
 
     public WorkloadRestClient(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;

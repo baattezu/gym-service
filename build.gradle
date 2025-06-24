@@ -12,6 +12,14 @@ group = 'org.saltaonelove'
 version = '1.0-SNAPSHOT'
 
 repositories {
+    maven {
+        url = uri(repositoryUrl)
+        allowInsecureProtocol=true
+        credentials {
+            username = nexusUsername // Укажите ваш логин
+            password = nexusPassword // Укажите ваш пароль
+        }
+    }
     mavenCentral()
 }
 
@@ -49,6 +57,9 @@ dependencies {
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
+
+    implementation 'org.saltaonelove:gym-shared:1.0.1-SNAPSHOT'
+
 }
 
 test {

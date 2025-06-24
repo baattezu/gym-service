@@ -4,7 +4,8 @@ import jakarta.persistence.EntityNotFoundException;
 import org.saltaonelove.clients.workload.WorkloadClient;
 import org.saltaonelove.dto.training.TrainingRequest;
 import org.saltaonelove.dto.workload.ActionType;
-import org.saltaonelove.dto.workload.WorkloadRequest;
+import org.saltaonelove.gymshared.util.logging.LoggingUtil;
+import org.saltaonelove.gymshared.util.logging.annotation.TransactionalWithLogging;
 import org.saltaonelove.model.Trainee;
 import org.saltaonelove.model.Trainer;
 import org.saltaonelove.model.Training;
@@ -13,8 +14,6 @@ import org.saltaonelove.repos.TraineeRepository;
 import org.saltaonelove.repos.TrainerRepository;
 import org.saltaonelove.repos.TrainingRepository;
 import org.saltaonelove.repos.TrainingTypeRepository;
-import org.saltaonelove.util.logging.LoggingUtil;
-import org.saltaonelove.util.logging.annotation.TransactionalWithLogging;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

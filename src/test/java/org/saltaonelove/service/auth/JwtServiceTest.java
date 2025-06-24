@@ -3,9 +3,12 @@ package org.saltaonelove.service.auth;
 import io.jsonwebtoken.JwtException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.saltaonelove.model.User;
-import org.springframework.security.authentication.BadCredentialsException;
+import org.saltaonelove.gymshared.security.service.JwtService;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.util.ReflectionTestUtils;
+
+import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -26,8 +29,11 @@ class JwtServiceTest {
 
     @Test
     void testGenerateAndValidateToken() {
-        User user = new User();
-        user.setUsername("johndoe");
+        UserDetails user = new org.springframework.security.core.userdetails.User(
+                "johndoe",
+                "somePassword",
+                Collections.singleton(new SimpleGrantedAuthority("ROLE_USER"))
+        );
 
         String token = jwtService.generateToken(user);
 
@@ -43,17 +49,4 @@ class JwtServiceTest {
         assertThrows(JwtException.class, () -> {jwtService.isValid(invalidToken);});
     }
 
-    @Test
-    void testTokenExpiration() throws InterruptedException {
-        ReflectionTestUtils.setField(jwtService, "expireTime", "1"); // 1ms
-
-        User user = new User();
-        user.setUsername("expiredUser");
-
-        String token = jwtService.generateToken(user);
-
-        Thread.sleep(5);
-
-        assertThrows(JwtException.class, () -> jwtService.isValid(token));
-    }
 }

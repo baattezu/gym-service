@@ -3,21 +3,21 @@ package org.saltaonelove.service;
 import org.saltaonelove.dto.auth.AuthRequest;
 import org.saltaonelove.dto.auth.AuthResponse;
 import org.saltaonelove.dto.auth.ChangeLoginRequest;
+import org.saltaonelove.gymshared.security.service.JwtService;
+import org.saltaonelove.gymshared.util.logging.annotation.TransactionalWithLogging;
 import org.saltaonelove.metrics.AuthMetrics;
 import org.saltaonelove.model.User;
 import org.saltaonelove.repos.UserRepository;
-import org.saltaonelove.service.auth.CustomUserDetailsService;
-import org.saltaonelove.service.auth.JwtService;
-import org.saltaonelove.util.logging.annotation.TransactionalWithLogging;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -93,7 +93,11 @@ public class UserCredentialsService{
         Map<String, Object> extraClaims = new HashMap<>();
         extraClaims.put("roles", List.of(userRepository.findUserPositionByUsername(user.getUsername())));
 
-        String token = jwtService.generateToken(extraClaims, user);
+        String token = jwtService.generateToken(extraClaims, new org.springframework.security.core.userdetails.User(
+                user.getUsername(),
+                user.getPassword(),
+                Collections.singleton(new SimpleGrantedAuthority("ROLE_USER"))
+        ));
         authMetrics.onSuccessfulLogin(user.getUserId());
 
         return new AuthResponse(token);
