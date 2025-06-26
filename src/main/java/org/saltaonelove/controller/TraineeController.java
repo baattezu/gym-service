@@ -5,15 +5,14 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.saltaonelove.dto.auth.AuthResponse;
-import org.saltaonelove.dto.trainee.TraineeRegisterRequest;
-import org.saltaonelove.dto.trainee.TraineeResponse;
-import org.saltaonelove.dto.trainee.TraineeUpdateRequest;
-import org.saltaonelove.dto.trainee.TraineeUpdateTrainersRequest;
-import org.saltaonelove.dto.trainer.TrainerResponse;
-import org.saltaonelove.dto.training.TrainingResponse;
-import org.saltaonelove.gymshared.util.logging.LoggingUtil;
 import org.saltaonelove.gymshared.util.logging.annotation.LogRestCall;
+import org.saltaonelove.model.dto.auth.AuthResponse;
+import org.saltaonelove.model.dto.trainee.TraineeRegisterRequest;
+import org.saltaonelove.model.dto.trainee.TraineeResponse;
+import org.saltaonelove.model.dto.trainee.TraineeUpdateRequest;
+import org.saltaonelove.model.dto.trainee.TraineeUpdateTrainersRequest;
+import org.saltaonelove.model.dto.trainer.TrainerResponse;
+import org.saltaonelove.model.dto.training.TrainingResponse;
 import org.saltaonelove.service.TraineeService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,8 +27,6 @@ import java.util.List;
 @LogRestCall
 @Tag(name = "Trainee", description = "Trainee operations")
 public class TraineeController {
-
-    private static final LoggingUtil log = LoggingUtil.getLogger(TraineeController.class);
 
     private TraineeService traineeService;
 

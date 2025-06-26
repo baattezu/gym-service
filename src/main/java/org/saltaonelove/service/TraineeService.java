@@ -1,16 +1,15 @@
 package org.saltaonelove.service;
 
-import org.saltaonelove.dto.auth.AuthResponse;
-import org.saltaonelove.dto.trainee.TraineeRegisterRequest;
-import org.saltaonelove.dto.trainee.TraineeResponse;
-import org.saltaonelove.dto.trainee.TraineeUpdateRequest;
-import org.saltaonelove.dto.trainer.TrainerResponse;
-import org.saltaonelove.dto.training.TrainingResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.saltaonelove.gymshared.util.UpdateUtil;
-import org.saltaonelove.gymshared.util.logging.LoggingUtil;
-import org.saltaonelove.gymshared.util.logging.annotation.TransactionalWithLogging;
-import org.saltaonelove.model.Trainee;
-import org.saltaonelove.model.Trainer;
+import org.saltaonelove.model.dto.auth.AuthResponse;
+import org.saltaonelove.model.dto.trainee.TraineeRegisterRequest;
+import org.saltaonelove.model.dto.trainee.TraineeResponse;
+import org.saltaonelove.model.dto.trainee.TraineeUpdateRequest;
+import org.saltaonelove.model.dto.trainer.TrainerResponse;
+import org.saltaonelove.model.dto.training.TrainingResponse;
+import org.saltaonelove.model.entity.Trainee;
+import org.saltaonelove.model.entity.Trainer;
 import org.saltaonelove.repos.TraineeRepository;
 import org.saltaonelove.repos.TrainerRepository;
 import org.saltaonelove.util.mapper.TraineeDtoMapper;
@@ -18,14 +17,14 @@ import org.saltaonelove.util.mapper.TrainerDtoMapper;
 import org.saltaonelove.util.mapper.TrainingDtoMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
 
 @Service
+@Slf4j
 public class TraineeService {
-
-    private static final LoggingUtil log = LoggingUtil.getLogger(TraineeService.class);
 
     private TraineeRepository traineeRepository;
     private TrainerRepository trainerRepository;
@@ -39,7 +38,7 @@ public class TraineeService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    @TransactionalWithLogging
+    @Transactional
     public AuthResponse registerTrainee(TraineeRegisterRequest traineeRegisterRequest) {
         log.info("Registering trainee: {} {}", traineeRegisterRequest.firstName(), traineeRegisterRequest.lastName());
         Trainee trainee = new Trainee(
@@ -56,7 +55,7 @@ public class TraineeService {
         return new AuthResponse(username, password);
     }
 
-    @TransactionalWithLogging
+    @Transactional
     public Trainee toggleActivationOfAccount(String username) {
         Trainee trainee = traineeRepository.findByUsername(username).get();
         trainee.setActive(!trainee.isActive());
@@ -76,7 +75,7 @@ public class TraineeService {
         return TraineeDtoMapper.toTraineeResponse(t);
     }
 
-    @TransactionalWithLogging
+    @Transactional
     public TraineeResponse updateTrainee(TraineeUpdateRequest traineeRequest) {
         log.info("Updating trainee: {} {}", traineeRequest.firstName(), traineeRequest.lastName());
         Trainee t = traineeRepository.findByUsername(traineeRequest.username()).get();
@@ -106,7 +105,7 @@ public class TraineeService {
         return trainers.stream().map(TrainerDtoMapper::toTrainerResponseInList).toList();
     }
 
-    @TransactionalWithLogging
+    @Transactional
     public Trainee changePassword(String username, String newPassword) {
         log.info("User {} is attempting to change their password", username);
         Trainee trainee = traineeRepository.findByUsername(username).get();
@@ -120,7 +119,7 @@ public class TraineeService {
         return trainee;
     }
 
-    @TransactionalWithLogging
+    @Transactional
     public List<TrainerResponse> updateTrainerList(String username, List<String> trainerList) {
         log.info("Updating trainer list for trainee: {}", username);
         Trainee trainee = traineeRepository.findByUsername(username).get();
@@ -138,7 +137,7 @@ public class TraineeService {
         return trainers.stream().map(TrainerDtoMapper::toTrainerResponseInList).toList();
     }
 
-    @TransactionalWithLogging
+    @Transactional
     public void deleteTrainee(String username) {
         log.info("User {} is attempting to delete account: {}", username);
         traineeRepository.deleteByUsername(username);

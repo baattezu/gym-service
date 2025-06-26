@@ -3,10 +3,10 @@ package org.saltaonelove.util;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.saltaonelove.InitModels;
-import org.saltaonelove.model.Trainee;
-import org.saltaonelove.model.Trainer;
-import org.saltaonelove.model.Training;
-import org.saltaonelove.model.TrainingType;
+import org.saltaonelove.model.entity.Trainee;
+import org.saltaonelove.model.entity.Trainer;
+import org.saltaonelove.model.entity.Training;
+import org.saltaonelove.model.entity.TrainingType;
 import org.saltaonelove.util.mapper.TrainingDtoMapper;
 
 import java.time.LocalDate;

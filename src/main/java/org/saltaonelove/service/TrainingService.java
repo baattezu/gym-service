@@ -1,28 +1,27 @@
 package org.saltaonelove.service;
 
 import jakarta.persistence.EntityNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 import org.saltaonelove.clients.workload.WorkloadClient;
-import org.saltaonelove.dto.training.TrainingRequest;
-import org.saltaonelove.dto.workload.ActionType;
-import org.saltaonelove.gymshared.util.logging.LoggingUtil;
-import org.saltaonelove.gymshared.util.logging.annotation.TransactionalWithLogging;
-import org.saltaonelove.model.Trainee;
-import org.saltaonelove.model.Trainer;
-import org.saltaonelove.model.Training;
-import org.saltaonelove.model.TrainingType;
+import org.saltaonelove.gymshared.model.workload.ActionType;
+import org.saltaonelove.model.dto.training.TrainingRequest;
+import org.saltaonelove.model.entity.Trainee;
+import org.saltaonelove.model.entity.Trainer;
+import org.saltaonelove.model.entity.Training;
+import org.saltaonelove.model.entity.TrainingType;
 import org.saltaonelove.repos.TraineeRepository;
 import org.saltaonelove.repos.TrainerRepository;
 import org.saltaonelove.repos.TrainingRepository;
 import org.saltaonelove.repos.TrainingTypeRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
+@Slf4j
 public class TrainingService {
-
-    private static final LoggingUtil log = LoggingUtil.getLogger(TrainerService.class);
 
     private TraineeRepository traineeRepository;
     private TrainerRepository trainerRepository;
@@ -38,7 +37,7 @@ public class TrainingService {
         this.workloadClient = workloadClient;
     }
 
-    @TransactionalWithLogging
+    @Transactional
     public Training createTraining(TrainingRequest trainingDTO) {
         log.info("Creating training {}", trainingDTO);
         Training training = new Training();
@@ -81,7 +80,7 @@ public class TrainingService {
         return trainingTypeRepository.findAll();
     }
 
-    @TransactionalWithLogging
+    @Transactional
     public void cancelTraining(Long id) {
         log.info("Cancelling training {}", id);
         Training training = getTraining(id);

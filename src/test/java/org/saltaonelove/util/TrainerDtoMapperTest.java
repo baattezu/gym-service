@@ -3,8 +3,8 @@ package org.saltaonelove.util;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.saltaonelove.InitModels;
-import org.saltaonelove.model.Trainee;
-import org.saltaonelove.model.Trainer;
+import org.saltaonelove.model.entity.Trainee;
+import org.saltaonelove.model.entity.Trainer;
 import org.saltaonelove.util.mapper.TrainerDtoMapper;
 
 import java.util.List;

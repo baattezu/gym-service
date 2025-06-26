@@ -1,29 +1,28 @@
 package org.saltaonelove.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.saltaonelove.clients.workload.WorkloadClient;
-import org.saltaonelove.dto.auth.AuthRequest;
-import org.saltaonelove.dto.auth.AuthResponse;
-import org.saltaonelove.dto.trainer.TrainerRequest;
-import org.saltaonelove.dto.trainer.TrainerResponse;
-import org.saltaonelove.dto.trainer.TrainerUpdateRequest;
-import org.saltaonelove.dto.training.TrainingResponse;
-import org.saltaonelove.gymshared.util.logging.LoggingUtil;
-import org.saltaonelove.gymshared.util.logging.annotation.TransactionalWithLogging;
-import org.saltaonelove.model.Trainer;
+import org.saltaonelove.model.dto.auth.AuthRequest;
+import org.saltaonelove.model.dto.auth.AuthResponse;
+import org.saltaonelove.model.dto.trainer.TrainerRequest;
+import org.saltaonelove.model.dto.trainer.TrainerResponse;
+import org.saltaonelove.model.dto.trainer.TrainerUpdateRequest;
+import org.saltaonelove.model.dto.training.TrainingResponse;
+import org.saltaonelove.model.entity.Trainer;
 import org.saltaonelove.repos.TrainerRepository;
 import org.saltaonelove.repos.TrainingTypeRepository;
 import org.saltaonelove.util.mapper.TrainerDtoMapper;
 import org.saltaonelove.util.mapper.TrainingDtoMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
 
 @Service
+@Slf4j
 public class TrainerService {
-
-    private static final LoggingUtil log = LoggingUtil.getLogger(TrainerService.class);
 
     private TrainerRepository trainerRepository;
     private TrainingTypeRepository trainingTypeRepository;
@@ -31,7 +30,11 @@ public class TrainerService {
     private PasswordEncoder passwordEncoder;
     private WorkloadClient workloadClient;
 
-    public TrainerService(TrainerRepository trainerRepository, TrainingTypeRepository trainingTypeRepository, UserCredentialsService userUtil, PasswordEncoder passwordEncoder, WorkloadClient workloadClient) {
+    public TrainerService(TrainerRepository trainerRepository,
+                          TrainingTypeRepository trainingTypeRepository,
+                          UserCredentialsService userUtil,
+                          PasswordEncoder passwordEncoder,
+                          WorkloadClient workloadClient) {
         this.trainerRepository = trainerRepository;
         this.trainingTypeRepository = trainingTypeRepository;
         this.userUtil = userUtil;
@@ -39,7 +42,7 @@ public class TrainerService {
         this.workloadClient = workloadClient;
     }
 
-    @TransactionalWithLogging
+    @Transactional
     public AuthResponse registerTrainer(TrainerRequest trainerRequest) {
         log.info("Registering trainer: {} {}", trainerRequest.firstName(), trainerRequest.lastName());
         Trainer trainer = new Trainer(
@@ -59,7 +62,7 @@ public class TrainerService {
         return new AuthResponse(username, password);
     }
 
-    @TransactionalWithLogging
+    @Transactional
     public Trainer toggleActivationOfAccount(String username) {
         Trainer trainer = trainerRepository.findByUsername(username).get();
         trainer.setActive(!trainer.isActive());
@@ -79,7 +82,7 @@ public class TrainerService {
         return TrainerDtoMapper.toTrainerResponse(t);
     }
 
-    @TransactionalWithLogging
+    @Transactional
     public TrainerResponse updateTrainer(String username, TrainerUpdateRequest trainerRequest) {
         log.info("Updating trainer: {} {}", trainerRequest.firstName(), trainerRequest.lastName());
         Trainer t = trainerRepository.findByUsername(username).get();
@@ -94,7 +97,7 @@ public class TrainerService {
         return TrainerDtoMapper.toTrainerResponse(t);
     }
 
-    @TransactionalWithLogging
+    @Transactional
     public Trainer changePassword(AuthRequest auth, String newPassword) {
         log.info("User {} is attempting to change their password", auth.username());
         Trainer trainer = trainerRepository.findByUsername(auth.username()).get();
@@ -116,7 +119,7 @@ public class TrainerService {
                 .stream().map(TrainingDtoMapper::toTrainingResponse).toList();
     }
 
-    @TransactionalWithLogging
+    @Transactional
     public void deleteTrainer(String username) {
         log.info("Deleting trainer {}", username);
         Trainer trainer = trainerRepository.findByUsername(username).get();

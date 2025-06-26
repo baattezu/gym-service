@@ -1,4 +1,4 @@
-package org.saltaonelove.dto.auth;
+package org.saltaonelove.model.dto.auth;
 
 
 import com.fasterxml.jackson.annotation.JsonInclude;

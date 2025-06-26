@@ -1,7 +1,7 @@
 package org.saltaonelove.util.mapper;
 
-import org.saltaonelove.dto.trainer.TrainerResponse;
-import org.saltaonelove.model.Trainer;
+import org.saltaonelove.model.dto.trainer.TrainerResponse;
+import org.saltaonelove.model.entity.Trainer;
 
 public class TrainerDtoMapper {
 

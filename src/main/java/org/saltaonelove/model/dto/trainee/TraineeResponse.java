@@ -1,8 +1,8 @@
-package org.saltaonelove.dto.trainee;
+package org.saltaonelove.model.dto.trainee;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
-import org.saltaonelove.dto.trainer.TrainerResponse;
+import org.saltaonelove.model.dto.trainer.TrainerResponse;
 
 import java.time.LocalDate;
 import java.util.List;

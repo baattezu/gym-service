@@ -1,6 +1,6 @@
 package org.saltaonelove.repos;
 
-import org.saltaonelove.model.User;
+import org.saltaonelove.model.entity.User;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;

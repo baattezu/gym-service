@@ -1,4 +1,4 @@
-package org.saltaonelove.dto.trainee;
+package org.saltaonelove.model.dto.trainee;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotBlank;

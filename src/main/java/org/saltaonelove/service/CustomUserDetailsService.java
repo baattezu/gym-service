@@ -1,6 +1,6 @@
 package org.saltaonelove.service;
 
-import org.saltaonelove.model.User;
+import org.saltaonelove.model.entity.User;
 import org.saltaonelove.repos.UserRepository;
 import org.springframework.context.annotation.Primary;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

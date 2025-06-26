@@ -1,6 +1,6 @@
-package org.saltaonelove.dto.training;
+package org.saltaonelove.model.dto.training;
 
-import org.saltaonelove.model.TrainingType;
+import org.saltaonelove.model.entity.TrainingType;
 
 import java.time.LocalDate;
 

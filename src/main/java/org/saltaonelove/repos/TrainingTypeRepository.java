@@ -1,6 +1,6 @@
 package org.saltaonelove.repos;
 
-import org.saltaonelove.model.TrainingType;
+import org.saltaonelove.model.entity.TrainingType;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;

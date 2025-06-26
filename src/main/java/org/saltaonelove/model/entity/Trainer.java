@@ -1,4 +1,4 @@
-package org.saltaonelove.model;
+package org.saltaonelove.model.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;

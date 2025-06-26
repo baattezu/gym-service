@@ -3,7 +3,7 @@ package org.saltaonelove.repos.implementation;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import org.saltaonelove.model.TrainingType;
+import org.saltaonelove.model.entity.TrainingType;
 import org.saltaonelove.repos.TrainingTypeRepository;
 import org.springframework.stereotype.Repository;
 

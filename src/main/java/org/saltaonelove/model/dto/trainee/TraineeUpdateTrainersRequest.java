@@ -1,7 +1,6 @@
-package org.saltaonelove.dto.trainee;
+package org.saltaonelove.model.dto.trainee;
 
 import jakarta.validation.constraints.NotNull;
-import org.saltaonelove.dto.auth.AuthRequest;
 
 import java.util.List;
 

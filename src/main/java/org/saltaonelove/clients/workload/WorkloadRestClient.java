@@ -1,7 +1,7 @@
 package org.saltaonelove.clients.workload;
 
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
-import org.saltaonelove.dto.workload.WorkloadRequest;
+import org.saltaonelove.gymshared.model.workload.WorkloadRequest;
 import org.saltaonelove.gymshared.util.auth.JwtUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

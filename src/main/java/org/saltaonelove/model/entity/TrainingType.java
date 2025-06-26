@@ -1,4 +1,4 @@
-package org.saltaonelove.model;
+package org.saltaonelove.model.entity;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;

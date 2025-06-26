@@ -1,11 +1,11 @@
-package org.saltaonelove.model;
+package org.saltaonelove.model.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
-import org.saltaonelove.dto.workload.ActionType;
-import org.saltaonelove.dto.workload.WorkloadRequest;
+import org.saltaonelove.gymshared.model.workload.ActionType;
+import org.saltaonelove.gymshared.model.workload.WorkloadRequest;
 
 import java.time.LocalDate;
 

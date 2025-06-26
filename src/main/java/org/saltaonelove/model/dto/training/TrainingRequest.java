@@ -1,9 +1,8 @@
-package org.saltaonelove.dto.training;
+package org.saltaonelove.model.dto.training;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
-import org.saltaonelove.dto.auth.AuthRequest;
 
 import java.time.LocalDate;
 

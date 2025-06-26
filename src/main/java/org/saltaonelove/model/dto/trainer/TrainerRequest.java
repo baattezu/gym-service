@@ -1,4 +1,4 @@
-package org.saltaonelove.dto.trainer;
+package org.saltaonelove.model.dto.trainer;
 
 import jakarta.validation.constraints.NotBlank;
 
