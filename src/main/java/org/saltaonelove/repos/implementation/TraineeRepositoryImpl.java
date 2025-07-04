@@ -4,14 +4,13 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.criteria.*;
-import org.saltaonelove.model.Trainee;
-import org.saltaonelove.model.Trainer;
-import org.saltaonelove.model.Training;
+import org.saltaonelove.model.entity.Trainee;
+import org.saltaonelove.model.entity.Trainer;
+import org.saltaonelove.model.entity.Training;
 import org.saltaonelove.repos.TraineeRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.ArrayList;

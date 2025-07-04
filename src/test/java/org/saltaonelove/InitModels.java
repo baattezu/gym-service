@@ -1,9 +1,9 @@
 package org.saltaonelove;
 
-import org.saltaonelove.model.Trainee;
-import org.saltaonelove.model.Trainer;
-import org.saltaonelove.model.Training;
-import org.saltaonelove.model.TrainingType;
+import org.saltaonelove.model.entity.Trainee;
+import org.saltaonelove.model.entity.Trainer;
+import org.saltaonelove.model.entity.Training;
+import org.saltaonelove.model.entity.TrainingType;
 
 import java.time.LocalDate;
 import java.util.List;

@@ -7,20 +7,20 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.saltaonelove.InitModels;
-import org.saltaonelove.dto.auth.AuthRequest;
-import org.saltaonelove.dto.auth.ChangeLoginRequest;
+import org.saltaonelove.model.dto.auth.AuthRequest;
+import org.saltaonelove.model.dto.auth.ChangeLoginRequest;
 import org.saltaonelove.metrics.AuthMetrics;
-import org.saltaonelove.model.Trainee;
-import org.saltaonelove.model.Trainer;
-import org.saltaonelove.model.User;
+import org.saltaonelove.model.entity.Trainee;
+import org.saltaonelove.model.entity.Trainer;
+import org.saltaonelove.model.entity.User;
 import org.saltaonelove.repos.UserRepository;
 
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class UserCredentialsServiceTest {

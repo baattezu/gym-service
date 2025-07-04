@@ -1,7 +1,7 @@
 package org.saltaonelove.util.mapper;
 
-import org.saltaonelove.dto.trainee.TraineeResponse;
-import org.saltaonelove.model.Trainee;
+import org.saltaonelove.model.dto.trainee.TraineeResponse;
+import org.saltaonelove.model.entity.Trainee;
 
 import java.time.LocalDate;
 

@@ -1,8 +1,7 @@
 package org.saltaonelove.repos;
 
-import org.saltaonelove.model.Trainee;
-import org.saltaonelove.model.Trainer;
-import org.saltaonelove.model.Training;
+import org.saltaonelove.model.entity.Trainee;
+import org.saltaonelove.model.entity.Training;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;

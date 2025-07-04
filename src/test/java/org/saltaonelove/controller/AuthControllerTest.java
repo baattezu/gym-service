@@ -4,14 +4,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.saltaonelove.TestSecurityConfig;
-import org.saltaonelove.dto.auth.AuthRequest;
-import org.saltaonelove.dto.auth.AuthResponse;
-import org.saltaonelove.dto.auth.ChangeLoginRequest;
-import org.saltaonelove.service.auth.CustomUserDetailsService;
-import org.saltaonelove.service.auth.JwtService;
-import org.saltaonelove.service.auth.LoginAttemptService;
+import org.saltaonelove.model.dto.auth.AuthRequest;
+import org.saltaonelove.model.dto.auth.AuthResponse;
+import org.saltaonelove.model.dto.auth.ChangeLoginRequest;
+import org.saltaonelove.gymshared.security.service.JwtService;
+import org.saltaonelove.gymshared.security.service.LoginAttemptService;
+import org.saltaonelove.gymshared.util.auth.LoginAttemptUtils;
 import org.saltaonelove.service.UserCredentialsService;
-import org.saltaonelove.util.auth.LoginAttemptUtils;
+import org.saltaonelove.service.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -20,8 +20,10 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(AuthController.class)
 @ContextConfiguration(classes = TestSecurityConfig.class)

@@ -13,6 +13,21 @@ version = '1.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
+    maven {
+        url = uri("https://maven.pkg.github.com/baattezu/gym-service")
+        credentials {
+            username = "baattezu"
+            password = "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" // read only token
+        }
+    }
+    maven {
+        url = uri(repositoryUrl)
+        allowInsecureProtocol=true
+        credentials {
+            username = nexusUsername
+            password = nexusPassword
+        }
+    }
 }
 
 dependencies {
@@ -41,6 +56,8 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt-jackson:0.11.1'
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
     implementation 'org.springframework.cloud:spring-cloud-starter-circuitbreaker-resilience4j'
+    implementation 'org.springframework.kafka:spring-kafka'
+    testImplementation 'org.springframework.kafka:spring-kafka-test'
 
     compileOnly 'org.projectlombok:lombok:1.18.30'
     annotationProcessor 'org.projectlombok:lombok:1.18.30'
@@ -49,6 +66,9 @@ dependencies {
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
+
+    implementation 'com.github.baattezu:gym-shared:1.0.0'
+
 }
 
 test {
