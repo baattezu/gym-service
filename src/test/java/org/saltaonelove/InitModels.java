@@ -12,7 +12,7 @@ public class InitModels {
 
     public static Trainee initTrainee(){
         Trainee trainee = new Trainee();
-        trainee.setUserId(1L);
+//        trainee.setUserId(1L);
         trainee.setFirstName("John");
         trainee.setLastName("Doe");
         trainee.setUsername("John.Doe");
@@ -33,7 +33,7 @@ public class InitModels {
 
     public static Trainer initTrainer(){
         Trainer trainer = new Trainer();
-        trainer.setUserId(2L);
+//        trainer.setUserId(2L);
         trainer.setFirstName("Jane");
         trainer.setLastName("Doe");
         trainer.setUsername("Jane.Doe");
@@ -46,7 +46,7 @@ public class InitModels {
 
     public static Training initTraining(Trainee trainee, Trainer trainer, TrainingType trainingType){
         Training training = new Training();
-        training.setTrainingId(1L);
+//        training.setTrainingId(1L);
         training.setTrainingType(trainingType);
         training.setTrainee(trainee);
         training.setTrainer(trainer);
@@ -62,7 +62,7 @@ public class InitModels {
         TrainingType trainingType = initTrainingType();
 
         Training training = new Training();
-        training.setTrainingId(1L);
+//        training.setTrainingId(1L);
         training.setTrainingType(trainingType);
         training.setTrainee(trainee);
         training.setTrainer(trainer);

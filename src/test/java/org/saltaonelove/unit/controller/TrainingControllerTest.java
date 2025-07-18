@@ -1,13 +1,14 @@
-package org.saltaonelove.controller;
+package org.saltaonelove.unit.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.saltaonelove.InitModels;
 import org.saltaonelove.TestSecurityConfig;
+import org.saltaonelove.controller.TrainingController;
+import org.saltaonelove.gymshared.security.service.JwtService;
 import org.saltaonelove.model.dto.auth.AuthRequest;
 import org.saltaonelove.model.dto.training.TrainingRequest;
-import org.saltaonelove.gymshared.security.service.JwtService;
 import org.saltaonelove.model.entity.TrainingType;
 import org.saltaonelove.service.CustomUserDetailsService;
 import org.saltaonelove.service.TrainingService;
@@ -39,12 +40,6 @@ class TrainingControllerTest {
     @MockBean
     private TrainingService trainingService;
 
-    @MockBean
-    private JwtService jwtService;
-    @MockBean
-    private CustomUserDetailsService customUserDetailsService;
-
-
     private AuthRequest authRequest;
 
     @BeforeEach
@@ -66,11 +61,11 @@ class TrainingControllerTest {
 
     @Test
     void testDeleteTraining() throws Exception {
-        Long trainingId = InitModels.initTraining().getTrainingId();
+        Long trainingId = 1l;
 
-        mockMvc.perform(delete("/api/training/"+trainingId))
+        mockMvc.perform(delete("/api/training/"+1))
                 .andExpect(status().isOk());
-        verify(trainingService).cancelTraining(InitModels.initTraining().getTrainingId());
+        verify(trainingService).cancelTraining(1l);
     }
 
     @Test

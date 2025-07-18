@@ -1,17 +1,18 @@
-package org.saltaonelove.controller;
+package org.saltaonelove.unit.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.saltaonelove.TestSecurityConfig;
-import org.saltaonelove.model.dto.auth.AuthRequest;
-import org.saltaonelove.model.dto.auth.AuthResponse;
-import org.saltaonelove.model.dto.auth.ChangeLoginRequest;
+import org.saltaonelove.controller.AuthController;
 import org.saltaonelove.gymshared.security.service.JwtService;
 import org.saltaonelove.gymshared.security.service.LoginAttemptService;
 import org.saltaonelove.gymshared.util.auth.LoginAttemptUtils;
-import org.saltaonelove.service.UserCredentialsService;
+import org.saltaonelove.model.dto.auth.AuthRequest;
+import org.saltaonelove.model.dto.auth.AuthResponse;
+import org.saltaonelove.model.dto.auth.ChangeLoginRequest;
 import org.saltaonelove.service.CustomUserDetailsService;
+import org.saltaonelove.service.UserCredentialsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -37,19 +38,6 @@ public class AuthControllerTest {
 
     @MockBean
     private UserCredentialsService userCredentialsService;
-
-    @MockBean
-    private JwtService jwtService;
-
-    @MockBean
-    private CustomUserDetailsService customUserDetailsService;
-
-    @MockBean
-    private LoginAttemptService loginAttemptService;
-
-    @MockBean
-    private LoginAttemptUtils loginAttemptUtils;
-
 
     @Test
     void testLogin() throws Exception {

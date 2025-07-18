@@ -1,4 +1,4 @@
-package org.saltaonelove.util;
+package org.saltaonelove.unit.util;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
