@@ -1,12 +1,8 @@
 package org.saltaonelove;
 
-import jakarta.inject.Qualifier;
 import org.mockito.Mockito;
-import org.saltaonelove.clients.workload.WorkloadClient;
-import org.saltaonelove.clients.workload.WorkloadKafkaClient;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Primary;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
