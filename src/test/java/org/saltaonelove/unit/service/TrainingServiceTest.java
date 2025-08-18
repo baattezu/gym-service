@@ -1,4 +1,4 @@
-package org.saltaonelove.service;
+package org.saltaonelove.unit.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -8,9 +8,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.saltaonelove.InitModels;
 import org.saltaonelove.clients.workload.WorkloadClient;
+import org.saltaonelove.gymshared.model.workload.WorkloadRequest;
 import org.saltaonelove.model.dto.auth.AuthRequest;
 import org.saltaonelove.model.dto.training.TrainingRequest;
-import org.saltaonelove.gymshared.model.workload.WorkloadRequest;
 import org.saltaonelove.model.entity.Trainee;
 import org.saltaonelove.model.entity.Trainer;
 import org.saltaonelove.model.entity.Training;
@@ -19,6 +19,7 @@ import org.saltaonelove.repos.TraineeRepository;
 import org.saltaonelove.repos.TrainerRepository;
 import org.saltaonelove.repos.TrainingRepository;
 import org.saltaonelove.repos.TrainingTypeRepository;
+import org.saltaonelove.service.TrainingService;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -28,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class TrainingServiceTest {
+public class TrainingServiceTest {
 
     @Mock
     private TrainingRepository trainingRepository;
@@ -82,8 +83,9 @@ class TrainingServiceTest {
     @Test
     void testCancelTraining() {
         when(trainingRepository.findById(anyLong())).thenReturn(Optional.of(training));
+        training.setTrainingId(1L);
 
-        trainingService.cancelTraining(training.getTrainingId());
+        trainingService.cancelTraining(1L);
 
         verify(trainingRepository, times(1)).delete(anyLong());
         verify(workloadClient).updateTrainerWorkload(any(WorkloadRequest.class));
@@ -104,6 +106,7 @@ class TrainingServiceTest {
     @Test
     void testGetTraining() {
         when(trainingRepository.findById(1L)).thenReturn(Optional.ofNullable(training));
+        training.setTrainingId(1L);
 
         Training result = trainingService.getTraining(1L);
 

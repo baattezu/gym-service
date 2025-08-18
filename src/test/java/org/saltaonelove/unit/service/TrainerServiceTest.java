@@ -1,4 +1,4 @@
-package org.saltaonelove.service;
+package org.saltaonelove.unit.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,6 +16,8 @@ import org.saltaonelove.model.dto.trainer.TrainerUpdateRequest;
 import org.saltaonelove.model.entity.Trainer;
 import org.saltaonelove.repos.TrainerRepository;
 import org.saltaonelove.repos.TrainingTypeRepository;
+import org.saltaonelove.service.TrainerService;
+import org.saltaonelove.service.UserCredentialsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
@@ -25,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class TrainerServiceTest {
+public class TrainerServiceTest {
 
     @Mock
     private TrainerRepository trainerRepository;

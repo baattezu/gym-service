@@ -12,6 +12,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,16 +30,18 @@ public class UserCredentialsService{
     private AuthenticationManager authenticationManager;
     private JwtService jwtService;
     private AuthMetrics authMetrics;
+    private PasswordEncoder passwordEncoder;
 
     public UserCredentialsService(
             UserRepository userRepository, AuthenticationManager authenticationManager,
             AuthMetrics authMetrics,
-            JwtService jwtService
+            JwtService jwtService, PasswordEncoder passwordEncoder
     ) {
         this.userRepository = userRepository;
         this.authenticationManager = authenticationManager;
         this.authMetrics = authMetrics;
         this.jwtService = jwtService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -108,11 +111,11 @@ public class UserCredentialsService{
             throw new IllegalArgumentException("Invalid username");
         }
         User user = userRepository.findByUsername(changeLoginRequest.username()).get();
-        if (!changeLoginRequest.oldPassword().equals(user.getPassword())) {
+        if (!passwordEncoder.matches(changeLoginRequest.oldPassword(), user.getPassword())) {
             throw new IllegalArgumentException("Old password is not correct");
         }
 
-        user.setPassword(changeLoginRequest.newPassword());
+        user.setPassword(passwordEncoder.encode(changeLoginRequest.newPassword()));
         userRepository.save(user);
         log.info("Changed password for user: {}", changeLoginRequest.username());
 

@@ -1,10 +1,12 @@
-package org.saltaonelove.controller;
+package org.saltaonelove.unit.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.saltaonelove.InitModels;
 import org.saltaonelove.TestSecurityConfig;
+import org.saltaonelove.controller.TraineeController;
+import org.saltaonelove.gymshared.security.service.JwtService;
 import org.saltaonelove.model.dto.auth.AuthResponse;
 import org.saltaonelove.model.dto.trainee.TraineeRegisterRequest;
 import org.saltaonelove.model.dto.trainee.TraineeResponse;
@@ -12,7 +14,6 @@ import org.saltaonelove.model.dto.trainee.TraineeUpdateRequest;
 import org.saltaonelove.model.dto.trainee.TraineeUpdateTrainersRequest;
 import org.saltaonelove.model.dto.trainer.TrainerResponse;
 import org.saltaonelove.model.dto.training.TrainingResponse;
-import org.saltaonelove.gymshared.security.service.JwtService;
 import org.saltaonelove.service.CustomUserDetailsService;
 import org.saltaonelove.service.TraineeService;
 import org.saltaonelove.util.mapper.TraineeDtoMapper;
@@ -45,12 +46,6 @@ class TraineeControllerTest {
 
     @MockBean
     private TraineeService traineeService;
-
-    @MockBean
-    private JwtService jwtService;
-    @MockBean
-    private CustomUserDetailsService customUserDetailsService;
-
 
     @Test
     void testRegisterTrainee() throws Exception {

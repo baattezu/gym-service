@@ -1,4 +1,4 @@
-package org.saltaonelove.service;
+package org.saltaonelove.unit.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -7,26 +7,32 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.saltaonelove.InitModels;
+import org.saltaonelove.metrics.AuthMetrics;
 import org.saltaonelove.model.dto.auth.AuthRequest;
 import org.saltaonelove.model.dto.auth.ChangeLoginRequest;
-import org.saltaonelove.metrics.AuthMetrics;
 import org.saltaonelove.model.entity.Trainee;
 import org.saltaonelove.model.entity.Trainer;
 import org.saltaonelove.model.entity.User;
 import org.saltaonelove.repos.UserRepository;
+import org.saltaonelove.service.UserCredentialsService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class UserCredentialsServiceTest {
+public class UserCredentialsServiceTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private PasswordEncoder encoder;
 
     @Mock
     private AuthMetrics authMetrics;
@@ -83,6 +89,8 @@ class UserCredentialsServiceTest {
         ChangeLoginRequest changeLoginRequest = new ChangeLoginRequest(authRequest.username(), authRequest.password(), "NewPassword");
 
         when(userRepository.findByUsername(trainee.getUsername())).thenReturn(Optional.of(trainee));
+        when(encoder.matches(any(), any())).thenReturn(true);
+        when(encoder.encode(any())).thenReturn("NewPassword");
         when(userRepository.save(trainee)).thenReturn(trainee);
 
         User user = userCredentialsService.changeLogin(authRequest.username(), changeLoginRequest);
@@ -99,6 +107,7 @@ class UserCredentialsServiceTest {
         ChangeLoginRequest changeLoginRequest = new ChangeLoginRequest(authRequest.username(), "WrongOldPassword", "NewPassword");
 
         when(userRepository.findByUsername(trainee.getUsername())).thenReturn(Optional.of(trainee));
+        when(encoder.matches(any(), any())).thenReturn(false);
 
         assertThrows(IllegalArgumentException.class, () -> userCredentialsService.changeLogin(authRequest.username(), changeLoginRequest));
     }

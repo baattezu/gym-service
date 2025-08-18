@@ -7,6 +7,7 @@ import jakarta.persistence.criteria.*;
 import org.saltaonelove.model.entity.Trainee;
 import org.saltaonelove.model.entity.Trainer;
 import org.saltaonelove.model.entity.Training;
+import org.saltaonelove.model.entity.TrainingType;
 import org.saltaonelove.repos.TrainerRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -93,7 +94,8 @@ public class TrainerRepositoryImpl implements TrainerRepository {
         }
 
         if (trainingType != null && !trainingType.isEmpty()) {
-            predicates.add(cb.equal(training.get("trainingType"), trainingType));
+            Join<Training, TrainingType> trainingTypeJoin = training.join("trainingType");
+            predicates.add(cb.equal(trainingTypeJoin.get("name"), trainingType));
         }
 
         query.select(training).where(predicates.toArray(new Predicate[0]));
